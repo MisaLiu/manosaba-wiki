@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "deepslate": "^0.25.1",
+    "prismarine-nbt": "^2.8.0",
     "tinyglobby": "^0.2.16"
   }
 }

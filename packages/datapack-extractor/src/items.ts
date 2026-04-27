@@ -2,23 +2,27 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { generateItems } from './generator/index';
 import { linkItemEvidence } from './linker/index';
+import { readSupplyLocations } from './location/supplies';
 import { scanItemDefinitions } from './scanner/item';
 import { scanItemTriggerEvidence } from './scanner/advancement';
 import { analyzeVariants } from './variants/index';
 
 const OUTPUT_PATH = path.resolve(process.cwd(), 'dist/items.json');
+const WORLD_PATH = path.resolve(process.cwd(), '../..', 'world');
 
 const buildItems = async () => {
   const definitions = await scanItemDefinitions();
   const triggers = await scanItemTriggerEvidence();
+  const supplyLocations = await readSupplyLocations(WORLD_PATH);
 
   const linkResult = linkItemEvidence(definitions, triggers);
   const variantResult = analyzeVariants(linkResult);
-  const generated = generateItems(linkResult, variantResult);
+  const generated = generateItems(linkResult, variantResult, supplyLocations);
 
   return {
     definitions,
     triggers,
+    supplyLocations,
     linkResult,
     variantResult,
     generated,
@@ -36,6 +40,7 @@ const main = async () => {
     outputPath: OUTPUT_PATH,
     definitionCount: result.definitions.length,
     triggerCount: result.triggers.length,
+    supplyLocationCount: result.supplyLocations.length,
     linkedItemCount: result.linkResult.linkedItems.length,
     variantAnalysisCount: result.variantResult.analyses.length,
     itemCount: result.generated.items.length,

@@ -5,6 +5,8 @@ import { buildPrimaryCanonicalKey, buildPrimaryDescription, buildPrimaryDescript
 import { mapItemTypes } from './types-map';
 import type { Item, GenerateItemsResult } from './types';
 import { buildVariantGroup } from './variants';
+import type { SupplyLocationSnapshot } from '../location/types';
+import { buildLocationSourcesForCandidate } from '../location/sources';
 
 const getVariantAnalysisMap = (result: VariantAnalysisResult) => {
   return new Map(result.analyses.map(analysis => [analysis.sourceCandidateId, analysis]));
@@ -12,7 +14,8 @@ const getVariantAnalysisMap = (result: VariantAnalysisResult) => {
 
 const buildItem = (
   candidate: LinkedItemCandidate,
-  analysisMap: Map<string, VariantAnalysisResult['analyses'][number]>
+  analysisMap: Map<string, VariantAnalysisResult['analyses'][number]>,
+  supplyLocations: SupplyLocationSnapshot[],
 ): Item => {
   const name = buildPrimaryName(candidate);
   const canonicalKey = buildPrimaryCanonicalKey(candidate);
@@ -33,6 +36,7 @@ const buildItem = (
     description,
     descriptionRich: buildPrimaryDescriptionRich(candidate),
     identity: buildIdentity(candidate),
+    sources: buildLocationSourcesForCandidate(candidate, supplyLocations),
     variant: analysis ? buildVariantGroup(analysis, candidate) : undefined,
     warnings: candidate.warnings.length > 0 ? candidate.warnings : undefined,
   };
@@ -41,11 +45,12 @@ const buildItem = (
 export const generateItems = (
   linkResult: LinkResult,
   variantResult: VariantAnalysisResult,
+  supplyLocations: SupplyLocationSnapshot[] = [],
 ): GenerateItemsResult => {
   const analysisMap = getVariantAnalysisMap(variantResult);
 
   return {
-    items: linkResult.linkedItems.map(candidate => buildItem(candidate, analysisMap)),
+    items: linkResult.linkedItems.map(candidate => buildItem(candidate, analysisMap, supplyLocations)),
     warnings: [],
   };
 };
