@@ -1,8 +1,8 @@
 import type { ItemCommandMatch } from './types';
 
-const GiveCommReg = /^give\s+@s\s+(.+)$/;
-const ReplaceCommReg = /^item\s+replace\s+entity\s+@s\s+([^\s]+)\s+with\s+(.+)$/;
-const MacroReplaceCommReg = /^\$item\s+replace\s+entity\s+@s\s+([^\s]+)\s+with\s+(.+)$/;
+const GiveCommReg = /^give\s+\S+\s+(.+)$/;
+const ReplaceCommReg = /^item\s+replace\s+entity\s+\S+\s+([^\s]+)\s+with\s+(.+)$/;
+const MacroReplaceCommReg = /^\$item\s+replace\s+entity\s+\S+\s+([^\s]+)\s+with\s+(.+)$/;
 
 export const commandMatch = (line: string): ItemCommandMatch | null => {
   const giveMatch = line.match(GiveCommReg);
