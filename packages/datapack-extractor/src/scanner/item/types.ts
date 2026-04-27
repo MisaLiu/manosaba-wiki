@@ -1,5 +1,5 @@
 
-export type ItemCommandType = 'give' | 'item_replace' | 'macro_item_replace';
+export type ItemCommandType = 'give' | 'macro_give' | 'item_replace' | 'macro_item_replace';
 
 export interface ItemCommandMatch {
   type: ItemCommandType,

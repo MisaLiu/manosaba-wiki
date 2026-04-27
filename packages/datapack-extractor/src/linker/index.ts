@@ -38,12 +38,45 @@ const matchDefinitionFingerprints = (
   right: ItemFingerprint
 ): LinkMatch => {
   if (left.itemModel && right.itemModel && left.itemModel === right.itemModel) {
-    return {
-      matched: true,
-      strength: 'strong',
-      ruleName: 'itemModel',
-      reason: `Merged definitions by itemModel '${left.itemModel}'`,
-    };
+    if (
+      left.customDataNormalized &&
+      right.customDataNormalized &&
+      left.customDataNormalized === right.customDataNormalized
+    ) {
+      return {
+        matched: true,
+        strength: 'strong',
+        ruleName: 'itemModel+customData',
+        reason: `Merged definitions by itemModel '${left.itemModel}' and customData`,
+      };
+    }
+
+    if (
+      left.customNameNormalized &&
+      right.customNameNormalized &&
+      left.customNameNormalized === right.customNameNormalized
+    ) {
+      return {
+        matched: true,
+        strength: 'strong',
+        ruleName: 'itemModel+customName',
+        reason: `Merged definitions by itemModel '${left.itemModel}' and customName '${left.customNameNormalized}'`,
+      };
+    }
+
+    if (
+      !left.customDataNormalized &&
+      !right.customDataNormalized &&
+      !left.customNameNormalized &&
+      !right.customNameNormalized
+    ) {
+      return {
+        matched: true,
+        strength: 'medium',
+        ruleName: 'itemModel',
+        reason: `Merged definitions by itemModel '${left.itemModel}'`,
+      };
+    }
   }
 
   if (
