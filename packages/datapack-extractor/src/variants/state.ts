@@ -77,6 +77,31 @@ const buildStateDescriptor = (
   };
 };
 
+const buildFallbackDescriptor = (
+  candidateId: string,
+  definitionIndex: number,
+  context: VariantContext,
+): VariantDescriptor | undefined => {
+  const definition = context.definitions[definitionIndex];
+  if (!definition) return undefined;
+
+  const label = definition.itemModel?.includes(':')
+    ? definition.itemModel.split(':')[1]
+    : definition.sourceStem;
+
+  return {
+    id: buildVariantId(candidateId, `model-${label}`),
+    label,
+    source: 'linked_definition',
+    definitionIndexes: [definitionIndex],
+    triggerIndexes: [],
+    itemModel: definition.itemModel,
+    customName: getDefinitionName(definition),
+    customData: getDefinitionData(definition),
+    warnings: [],
+  };
+};
+
 export const detectStateVariants = (context: VariantContext): VariantAnalysis | undefined => {
   const definitionGroups = groupDefinitionsByState(context.definitions);
   const triggerGroups = groupTriggersByState(context.triggers);
@@ -108,13 +133,21 @@ export const detectStateVariants = (context: VariantContext): VariantAnalysis | 
   }
 
   const usedDefinitionIndexes = variants.flatMap(variant => variant.definitionIndexes);
+  const fallbackVariants = context.definitions
+    .map((_, index) => index)
+    .filter(index => !usedDefinitionIndexes.includes(index))
+    .map(index => buildFallbackDescriptor(context.candidate.id, index, context))
+    .filter((variant): variant is VariantDescriptor => Boolean(variant));
+
+  const allVariants = [...variants, ...fallbackVariants];
+  const allUsedDefinitionIndexes = allVariants.flatMap(variant => variant.definitionIndexes);
 
   return {
     itemId: context.candidate.id,
     sourceCandidateId: context.candidate.id,
     kind: 'state',
-    baseDefinitionIndexes: pickBaseDefinitionIndexes(context.definitions.length, usedDefinitionIndexes),
-    variants,
+    baseDefinitionIndexes: pickBaseDefinitionIndexes(context.definitions.length, allUsedDefinitionIndexes),
+    variants: allVariants,
     warnings: [],
   };
 };
