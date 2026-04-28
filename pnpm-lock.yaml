@@ -51,6 +51,9 @@ importers:
         specifier: ^5.0.12
         version: 5.0.12
     devDependencies:
+      '@manosaba/types':
+        specifier: workspace:*
+        version: link:../types
       '@preact/preset-vite':
         specifier: ^2.10.5
         version: 2.10.5(@babel/core@7.29.0)(preact@10.29.1)(vite@8.0.10(@types/node@24.12.2))
