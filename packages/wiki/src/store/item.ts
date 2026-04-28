@@ -27,6 +27,7 @@ export const useItemStore = create<ItemStore>((set, get) => ({
       set({ items, loading: false });
     } catch (error) {
       set({ loading: false, error: (error as Error).message ?? JSON.stringify(error) });
+      console.error(error);
     }
   }
 }));
