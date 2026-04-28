@@ -1,18 +1,23 @@
-import { CardHeader } from './Header';
 import { MCRichText } from '../MCRichText/MCRichText';
 import type { Item } from '@manosaba/types';
 
-type CardProps = {
+type ItemCardProps = {
   item: Item
 };
 
-export const Card = ({ item }: CardProps) => {
+export const ItemCard = ({ item }: ItemCardProps) => {
   return (
-    <div class="p-4 border rounded-md">
-      <CardHeader title={item.name} />
+    <div class="p-4 border rounded-md item-list-card">
+      <div class="pb-2">
+        <div>
+          <div class="text-xl">{item.name}</div>
+        </div>
+      </div>
+
       <div>
         <MCRichText document={item.descriptionRich ?? null} />
       </div>
+
       {item.types && (
         <div class="pt-2">
           <div class="text-gray-500">

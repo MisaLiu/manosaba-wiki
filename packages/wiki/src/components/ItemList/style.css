@@ -1,0 +1,30 @@
+.item-list {
+  column-count: 1;
+  column-gap: calc(var(--spacing) * 4);
+}
+
+@media (min-width: 420px) {
+  .item-list {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 768px) {
+  .item-list {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1024px) {
+  .item-list {
+    column-count: 4;
+  }
+}
+
+.item-list-card {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: calc(var(--spacing) * 4);
+}
