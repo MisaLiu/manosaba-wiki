@@ -60,10 +60,15 @@ const matchesCandidate = (candidate: LinkedItemCandidate, stack: ContainerItemSt
   });
 };
 
-const buildLocationSource = (snapshot: SupplyLocationSnapshot, probability: number): LocationSource => {
+const buildLocationSource = (
+  snapshot: SupplyLocationSnapshot,
+  stack: ContainerItemStack,
+  probability: number,
+): LocationSource => {
   return {
     type: 'location',
     name: snapshot.location.name,
+    count: stack.count,
     probability,
     implementation: 'manual',
   };
@@ -78,7 +83,7 @@ export const buildLocationSourcesForCandidate = (
   for (const supply of supplies) {
     for (const item of supply.items) {
       if (matchesCandidate(candidate, item.stack)) {
-        sources.push(buildLocationSource(supply, item.probability));
+        sources.push(buildLocationSource(supply, item.stack, item.probability));
       }
     }
   }

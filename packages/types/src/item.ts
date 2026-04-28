@@ -21,6 +21,7 @@ export interface ItemIdentity {
 export interface LocationSource {
   type: 'location',
   name: string,
+  count?: number,
   probability?: number,
   implementation?: 'loot_table' | 'manual' | 'unknown',
   lootTableId?: string,
