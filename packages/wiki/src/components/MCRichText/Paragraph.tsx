@@ -13,10 +13,10 @@ export const RichTextParagraph = ({
         const { text, marks } = i;
         let classes = [ "mc-rich-text-span" ];
         if (marks) {
-          if (marks.bold) classes.push('mc-bold');
-          if (marks.italic) classes.push('mc-italic');
-          if (marks.strikethrough) classes.push('mc-delete');
-          if (marks.underlined) classes.push('mc-underline');
+          if (marks.bold) classes.push('font-bold');
+          if (marks.italic) classes.push('italic');
+          if (marks.strikethrough) classes.push('line-through');
+          if (marks.underlined) classes.push('underline');
           if (marks.color) classes.push(`mc-color-${marks.color.replaceAll('_', '-').toLowerCase()}`);
         }
 
