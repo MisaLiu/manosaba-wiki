@@ -11,6 +11,7 @@ export interface SupplyDefinitionEvidence {
 
   locationName: string,
   slotRanges?: SupplyRandomRule[],
+  probability?: number,
 
   baseItemId?: string,
   count?: number,
@@ -24,6 +25,7 @@ export interface SupplyDefinitionEvidence {
   maxStackSize?: number,
   maxDamage?: number,
   damage?: number,
+  isUnique?: boolean,
 
   warnings: string[],
 }

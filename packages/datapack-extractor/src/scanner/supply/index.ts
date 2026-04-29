@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { scanSupplyDefinitionFiles } from './files';
 import { getSupplyPosZ, getSupplyRanges } from './parse';
-import { extractKnownFields } from './fields';
+import { extractKnownFields, buildProbabilityMap } from './fields';
 import { containerFilter, inferLocationName } from './utils';
 import { readContainerAt } from '../../utils/region';
 import type { SupplyDefinitionEvidence } from './types';
@@ -32,6 +32,7 @@ export const extractItemDefinitionsFromSupply = async (
 
   const supplyRanges = getSupplyRanges(content);
   const supplyPosZ = getSupplyPosZ(content) ?? NaN;
+  const probabilityMap = buildProbabilityMap(supplyRanges);
 
   if (isNaN(supplyPosZ))
     throw new Error(`Cannot parse supply container Z coords in definition: ${filePath}`);
@@ -57,6 +58,7 @@ export const extractItemDefinitionsFromSupply = async (
 
       locationName: inferLocationName(filePath),
       slotRanges: ranges,
+      probability: probabilityMap.get(item.slot),
 
       baseItemId: item.id,
       count: item.count,
