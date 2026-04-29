@@ -14,7 +14,6 @@ import { buildLocationSourcesForCandidate } from '../location/sources';
 import { buildCraftingSourcesForCandidate } from '../recipe/sources';
 import type { Item, Recipe } from '@manosaba/types';
 import type { GenerateItemsResult } from './types';
-import type { SupplyLocationSnapshot } from '../location/types';
 import type { LinkResult, LinkedItemCandidate } from '../linker/types';
 import type { VariantAnalysisResult } from '../variants/types';
 
@@ -25,7 +24,6 @@ const getVariantAnalysisMap = (result: VariantAnalysisResult) => {
 const buildItem = (
   candidate: LinkedItemCandidate,
   analysisMap: Map<string, VariantAnalysisResult['analyses'][number]>,
-  supplyLocations: SupplyLocationSnapshot[],
   recipes: Recipe[],
 ): Item => {
   const name = buildPrimaryName(candidate);
@@ -36,7 +34,7 @@ const buildItem = (
   const description = buildPrimaryDescription(candidate);
 
   const sources = [
-    ...buildLocationSourcesForCandidate(candidate, supplyLocations),
+    ...buildLocationSourcesForCandidate(candidate),
     ...buildCraftingSourcesForCandidate(candidate, recipes),
   ];
 
@@ -61,13 +59,12 @@ const buildItem = (
 export const generateItems = (
   linkResult: LinkResult,
   variantResult: VariantAnalysisResult,
-  supplyLocations: SupplyLocationSnapshot[] = [],
   recipes: Recipe[] = [],
 ): GenerateItemsResult => {
   const analysisMap = getVariantAnalysisMap(variantResult);
 
   return {
-    items: linkResult.linkedItems.map(candidate => buildItem(candidate, analysisMap, supplyLocations, recipes)),
+    items: linkResult.linkedItems.map(candidate => buildItem(candidate, analysisMap, recipes)),
     warnings: [],
   };
 };

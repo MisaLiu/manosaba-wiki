@@ -1,4 +1,9 @@
-import { normalizeTextComponentLike } from '../utils/snbt';
+import { normalizeTextComponentLike, parseSnbtLike } from '../utils/snbt';
+
+const toRawString = (value: unknown): string | undefined => {
+  if (value === undefined || value === null) return undefined;
+  return typeof value === 'string' ? value : JSON.stringify(value);
+};
 
 export const splitTopLevelLoreEntries = (input: string): string[] => {
   const content = input.slice(1, -1);
@@ -49,8 +54,10 @@ export const splitTopLevelLoreEntries = (input: string): string[] => {
   return entries;
 };
 
-const stringifyLoreEntry = (value: string): string | undefined => {
-  const normalized = normalizeTextComponentLike(value);
+const stringifyLoreEntry = (value: unknown): string | undefined => {
+  const normalized = typeof value === 'string'
+    ? normalizeTextComponentLike(value)
+    : normalizeTextComponentLike(JSON.stringify(value));
   const trimmed = normalized?.trim();
 
   if (!trimmed || trimmed === '""' || trimmed === '{"text":""}') {
@@ -60,12 +67,20 @@ const stringifyLoreEntry = (value: string): string | undefined => {
   return trimmed;
 };
 
-export const parseLoreLines = (loreRaw?: string): string[] => {
-  if (!loreRaw) return [];
+export const parseLoreLines = (loreRaw?: unknown): string[] => {
+  const raw = toRawString(loreRaw);
+  if (!raw) return [];
 
-  const trimmed = loreRaw.trim();
+  const trimmed = raw.trim();
   if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) {
     return [];
+  }
+
+  const parsed = parseSnbtLike(trimmed);
+  if (Array.isArray(parsed)) {
+    return parsed
+      .map(entry => stringifyLoreEntry(entry))
+      .filter((entry): entry is string => Boolean(entry));
   }
 
   return splitTopLevelLoreEntries(trimmed)

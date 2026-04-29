@@ -4,9 +4,10 @@ import { filterIngameItemDefinitions, filterIngameItemTriggers } from './filter/
 import { generateItems } from './generator/index';
 import { generateRecipes } from './generator/recipes';
 import { linkItemEvidence } from './linker/index';
-import { readSupplyLocations } from './location/supplies';
 import { scanRecipes } from './scanner/recipe';
-import { scanItemDefinitions } from './scanner/item';
+import { scanItemDefinitions as scanDatapackItemDefinitions } from './scanner/item';
+import { adaptSupplyDefinitionsToItemDefinitions } from './scanner/supply/adapter';
+import { scanItemDefinitions as scanSupplyDefinitions } from './scanner/supply';
 import { scanItemTriggerEvidence } from './scanner/advancement';
 import { analyzeVariants } from './variants/index';
 
@@ -14,10 +15,14 @@ const OUTPUT_PATH = path.resolve(process.cwd(), 'dist/items.json');
 const RECIPES_OUTPUT_PATH = path.resolve(process.cwd(), 'dist/recipes.json');
 
 export const buildArtifacts = async () => {
-  const allDefinitions = await scanItemDefinitions();
+  const supplyDefinitions = await scanSupplyDefinitions();
+  const datapackDefinitions = await scanDatapackItemDefinitions();
+  const allDefinitions = [
+    ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.logical),
+    ...datapackDefinitions,
+  ];
   const allTriggers = await scanItemTriggerEvidence();
   const recipes = await scanRecipes();
-  const supplyLocations = await readSupplyLocations(WORLD_ROOT);
 
   const definitions = filterIngameItemDefinitions(allDefinitions);
   const triggers = filterIngameItemTriggers(allTriggers);
@@ -25,13 +30,13 @@ export const buildArtifacts = async () => {
   const linkResult = linkItemEvidence(definitions, triggers);
   const variantResult = analyzeVariants(linkResult);
   const recipesOut = generateRecipes(recipes, linkResult.linkedItems);
-  const items = generateItems(linkResult, variantResult, supplyLocations, recipesOut);
+  const items = generateItems(linkResult, variantResult, recipesOut);
 
   return {
     definitions,
     triggers,
     recipes,
-    supplyLocations,
+    supplyDefinitions,
     linkResult,
     variantResult,
     items,

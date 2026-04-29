@@ -2,6 +2,11 @@ import { parseSnbtLike } from '../utils/snbt';
 import { splitTopLevelLoreEntries } from './lore';
 import type { RichTextBlock, RichTextDocument, RichTextMarks, RichTextSpan } from '@manosaba/types';
 
+const toRawString = (value: unknown): string | undefined => {
+  if (value === undefined || value === null) return undefined;
+  return typeof value === 'string' ? value : JSON.stringify(value);
+};
+
 const isEmptyTextNode = (value: unknown): boolean => {
   return typeof value === 'string'
     ? value.trim() === ''
@@ -70,17 +75,27 @@ const buildBlock = (entry: string): RichTextBlock | undefined => {
   };
 };
 
-export const buildRichTextFromLore = (loreRaw?: string): RichTextDocument | undefined => {
-  if (!loreRaw) return undefined;
+export const buildRichTextFromLore = (loreRaw?: unknown): RichTextDocument | undefined => {
+  const raw = toRawString(loreRaw);
+  if (!raw) return undefined;
 
-  const trimmed = loreRaw.trim();
+  const trimmed = raw.trim();
   if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) {
     return undefined;
   }
 
-  const blocks = splitTopLevelLoreEntries(trimmed)
-    .map(buildBlock)
-    .filter((block): block is RichTextBlock => Boolean(block));
+  const parsed = parseSnbtLike(trimmed);
+  const blocksFromParsed = Array.isArray(parsed)
+    ? parsed
+      .map((entry) => buildBlock(JSON.stringify(entry)))
+      .filter((block): block is RichTextBlock => Boolean(block))
+    : [];
+
+  const blocks = blocksFromParsed.length > 0
+    ? blocksFromParsed
+    : splitTopLevelLoreEntries(trimmed)
+      .map(buildBlock)
+      .filter((block): block is RichTextBlock => Boolean(block));
 
   const contentBlocks = blocks.length > 1 ? blocks.slice(0, -1) : blocks;
 

@@ -15,6 +15,8 @@ export interface SupplyDefinitionEvidence {
   namespace: string,
   slot?: string,
   layer: 'template' | 'replacement',
+  sourceSlot: number,
+  sourceLayer?: 'template' | 'replacement',
 
   locationName: string,
   slotRanges?: SupplyRandomRule[],
@@ -35,4 +37,10 @@ export interface SupplyDefinitionEvidence {
   isUnique?: boolean,
 
   warnings: string[],
+}
+
+export interface SupplyScanResult {
+  template: SupplyDefinitionEvidence[],
+  replacement: SupplyDefinitionEvidence[],
+  logical: SupplyDefinitionEvidence[],
 }

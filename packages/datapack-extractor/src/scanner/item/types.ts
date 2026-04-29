@@ -22,18 +22,21 @@ export interface ItemDefinitionEvidence {
   sourceDir: string,
   namespace: string,
 
-  definitionSourceType: 'mcfunction',
+  definitionSourceType: 'mcfunction' | 'supply',
   commandType: ItemCommandType,
   slot?: string,
+  layer?: 'template' | 'replacement',
+  locationName?: string,
+  probability?: number,
 
   baseItemId?: string,
   count?: number,
   rawComponents?: Record<string, string>;
 
   itemModel?: string,
-  customNameRaw?: string,
-  loreRaw?: string,
-  customDataRaw?: string,
+  customNameRaw?: unknown,
+  loreRaw?: unknown,
+  customDataRaw?: unknown,
   maxStackSize?: number,
   maxDamage?: number,
   damage?: number,

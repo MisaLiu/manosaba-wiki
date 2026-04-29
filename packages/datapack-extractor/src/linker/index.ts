@@ -1,4 +1,5 @@
 import { buildDefinitionFingerprint, buildTriggerFingerprint } from './fingerprint';
+import { parseLoreLines } from '../generator/lore';
 import { matchFingerprints } from './rules';
 import type {
   ItemFingerprint,
@@ -230,7 +231,47 @@ const matchDefinitionFingerprints = (
   return { matched: false };
 };
 
+const buildLoreSignature = (definition: ItemDefinitionEvidence): string | undefined => {
+  const lines = parseLoreLines(definition.loreRaw);
+  if (lines.length === 0) {
+    return undefined;
+  }
+
+  return lines.join('\n');
+};
+
+const matchSupplyDefinitions = (
+  left: ItemDefinitionEvidence,
+  right: ItemDefinitionEvidence,
+): LinkMatch | undefined => {
+  if (left.definitionSourceType !== 'supply' || right.definitionSourceType !== 'supply') {
+    return undefined;
+  }
+
+  if (left.baseItemId !== right.baseItemId || left.count !== right.count) {
+    return undefined;
+  }
+
+  if (left.itemModel || right.itemModel || left.customDataRaw || right.customDataRaw || left.customNameRaw || right.customNameRaw) {
+    return undefined;
+  }
+
+  const leftLore = buildLoreSignature(left);
+  const rightLore = buildLoreSignature(right);
+  if (!leftLore || !rightLore || leftLore !== rightLore) {
+    return undefined;
+  }
+
+  return {
+    matched: true,
+    strength: 'medium',
+    ruleName: 'supplyBaseItem+lore+count',
+    reason: `Merged supply definitions by baseItemId '${left.baseItemId}', lore and count`,
+  };
+};
+
 const findBestCandidateForDefinition = (
+  definition: ItemDefinitionEvidence,
   definitionFingerprint: ItemFingerprint,
   candidates: CandidateState[]
 ): DefinitionMatchCandidate | undefined => {
@@ -239,7 +280,20 @@ const findBestCandidateForDefinition = (
   for (let i = 0; i < candidates.length; i++) {
     const candidateState = candidates[i];
 
-    for (const fingerprint of candidateState.definitionFingerprints) {
+    for (let j = 0; j < candidateState.definitionFingerprints.length; j++) {
+      const fingerprint = candidateState.definitionFingerprints[j];
+      const supplyMatch = matchSupplyDefinitions(candidateState.candidate.definitions[j], definition);
+      if (supplyMatch?.matched) {
+        const rank = strengthRank(supplyMatch.strength);
+        if (!best || rank > strengthRank(best.match.strength)) {
+          best = {
+            candidateIndex: i,
+            match: supplyMatch,
+          };
+        }
+        continue;
+      }
+
       const match = matchDefinitionFingerprints(fingerprint, definitionFingerprint);
       if (!match.matched) continue;
 
@@ -263,7 +317,7 @@ const createDefinitionCandidates = (
 
   for (const definition of definitions) {
     const { fingerprint, warnings } = buildDefinitionFingerprint(definition);
-    const matched = findBestCandidateForDefinition(fingerprint, candidates);
+    const matched = findBestCandidateForDefinition(definition, fingerprint, candidates);
 
     if (!matched) {
       candidates.push({
@@ -290,6 +344,41 @@ const createDefinitionCandidates = (
   }
 
   return candidates;
+};
+
+const createSupplyCandidates = (
+  definitions: ItemDefinitionEvidence[]
+): CandidateState[] => {
+  const supplyDefinitions = definitions.filter(definition => definition.definitionSourceType === 'supply');
+  return createDefinitionCandidates(supplyDefinitions);
+};
+
+const attachDefinitionsToCandidates = (
+  candidates: CandidateState[],
+  definitions: ItemDefinitionEvidence[]
+): ItemDefinitionEvidence[] => {
+  const unlinked: ItemDefinitionEvidence[] = [];
+
+  for (const definition of definitions) {
+    const { fingerprint, warnings } = buildDefinitionFingerprint(definition);
+    const matched = findBestCandidateForDefinition(definition, fingerprint, candidates);
+
+    if (!matched) {
+      unlinked.push(definition);
+      continue;
+    }
+
+    const target = candidates[matched.candidateIndex];
+    target.candidate.definitions.push(definition);
+    target.candidate.fingerprints.push(fingerprint);
+    target.definitionFingerprints.push(fingerprint);
+    target.candidate.warnings.push(...warnings);
+    if (matched.match.reason) {
+      target.candidate.warnings.push(matched.match.reason);
+    }
+  }
+
+  return unlinked;
 };
 
 const strengthRank = (strength?: LinkMatch['strength']): number => {
@@ -336,8 +425,14 @@ export const linkItemEvidence = (
 ): LinkResult => {
   const parametricDefinitions = definitions.filter(isParametricDefinition);
   const templateDefinitions = definitions.filter(definition => isTemplateDefinition(definition) && !isParametricDefinition(definition));
-  const linkableDefinitions = definitions.filter(definition => !isTemplateDefinition(definition));
-  const candidates = createDefinitionCandidates(linkableDefinitions);
+  const supplyDefinitions = definitions.filter(definition => definition.definitionSourceType === 'supply');
+  const datapackDefinitions = definitions.filter(definition => definition.definitionSourceType !== 'supply');
+  const supplyCandidates = createSupplyCandidates(supplyDefinitions);
+  const unlinkedDatapackDefinitions = attachDefinitionsToCandidates(
+    supplyCandidates,
+    datapackDefinitions.filter(definition => !isTemplateDefinition(definition))
+  );
+  const candidates = supplyCandidates;
 
   const unlinkedTriggers: ItemTriggerEvidence[] = [];
   const nonItemTriggers: ItemTriggerEvidence[] = [];
@@ -382,7 +477,8 @@ export const linkItemEvidence = (
 
   const unlinkedDefinitions = linkedItems
     .filter(candidate => candidate.triggers.length === 0)
-    .flatMap(candidate => candidate.definitions);
+    .flatMap(candidate => candidate.definitions)
+    .concat(unlinkedDatapackDefinitions);
 
   return {
     linkedItems,

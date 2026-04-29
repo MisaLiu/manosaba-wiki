@@ -1,7 +1,7 @@
 import { scanSupplyTypeFiles } from './files';
 import { parseSupplyTypeFile } from './parse';
 import { buildSupplyLocationSnapshot } from './probability';
-import { readContainerAt } from '../index';
+import { readContainerAt } from '../../utils/region';
 import type { ContainerItemStack, ContainerSnapshot, SupplyLocationSnapshot } from '../types';
 
 const SUPPLY_X = 1029;

@@ -1,33 +1,28 @@
 import type { ItemDefinitionEvidence } from '../item/types';
 import type { SupplyDefinitionEvidence } from './types';
 
-const stringifyMaybe = (value: unknown): string | undefined => {
-  if (value === undefined || value === null) {
-    return undefined;
-  }
-
-  return typeof value === 'string' ? value : JSON.stringify(value);
-};
-
 export const adaptSupplyDefinitionToItemDefinition = (
   definition: SupplyDefinitionEvidence,
 ): ItemDefinitionEvidence => {
   return {
     kind: 'item_definition',
-    definitionSourceType: 'mcfunction',
+    definitionSourceType: 'supply',
     sourcePath: definition.sourcePath,
     sourceStem: definition.sourceStem,
     sourceDir: definition.sourceDir,
     namespace: definition.namespace,
     commandType: 'give',
     slot: definition.slot,
+    layer: definition.layer,
+    locationName: definition.locationName,
+    probability: definition.probability,
     baseItemId: definition.baseItemId,
     count: definition.count,
     rawComponents: definition.rawComponents,
     itemModel: definition.itemModel,
-    customNameRaw: stringifyMaybe(definition.customName),
-    loreRaw: stringifyMaybe(definition.lore),
-    customDataRaw: stringifyMaybe(definition.customData),
+    customNameRaw: definition.customName,
+    loreRaw: definition.lore,
+    customDataRaw: definition.customData,
     maxStackSize: definition.maxStackSize,
     maxDamage: definition.maxDamage,
     damage: definition.damage,

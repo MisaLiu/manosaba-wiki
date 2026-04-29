@@ -1,5 +1,10 @@
 import { normalizeSnbtLike, normalizeTextComponentLike } from '../utils/snbt';
 
+const toRawString = (value: unknown): string | undefined => {
+  if (value === undefined || value === null) return undefined;
+  return typeof value === 'string' ? value : JSON.stringify(value);
+};
+
 export const normalizeBaseItemId = (value?: string): string | undefined => {
   if (!value) return undefined;
 
@@ -9,10 +14,11 @@ export const normalizeBaseItemId = (value?: string): string | undefined => {
   return trimmed.includes(':') ? trimmed : `minecraft:${trimmed}`;
 };
 
-export const normalizeCustomData = (value?: string): string | undefined => {
-  if (!value) return undefined;
+export const normalizeCustomData = (value?: unknown): string | undefined => {
+  const raw = toRawString(value);
+  if (!raw) return undefined;
 
-  const trimmed = value.trim();
+  const trimmed = raw.trim();
   if (!trimmed) return undefined;
 
   const normalized = normalizeSnbtLike(trimmed);
@@ -23,10 +29,11 @@ export const normalizeCustomData = (value?: string): string | undefined => {
   return trimmed.replace(/\s+/g, '');
 };
 
-export const normalizeCustomName = (value?: string): string | undefined => {
-  if (!value) return undefined;
+export const normalizeCustomName = (value?: unknown): string | undefined => {
+  const raw = toRawString(value);
+  if (!raw) return undefined;
 
-  const trimmed = value.trim();
+  const trimmed = raw.trim();
   if (!trimmed) return undefined;
 
   const looksLikeStructuredComponent =

@@ -74,6 +74,8 @@ const splitTopLevelSnbtEntries = (input: string): string[] => {
   return entries;
 };
 
+// Fallback for mixed JSON/SNBT lore arrays that deepslate cannot parse
+// reliably, such as ["", [{"text":"..."}]].
 const parseArrayLike = (input: string): unknown[] | undefined => {
   const trimmed = input.trim();
   if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) {
