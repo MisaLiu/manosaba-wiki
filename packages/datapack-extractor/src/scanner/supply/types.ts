@@ -42,5 +42,4 @@ export interface SupplyDefinitionEvidence {
 export interface SupplyScanResult {
   template: SupplyDefinitionEvidence[],
   replacement: SupplyDefinitionEvidence[],
-  logical: SupplyDefinitionEvidence[],
 }

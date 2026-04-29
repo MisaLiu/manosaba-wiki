@@ -157,6 +157,13 @@ const matchDefinitionFingerprints = (
     return stateVariantMatch;
   }
 
+  if (left.itemModel && right.itemModel && left.itemModel !== right.itemModel) {
+    return {
+      matched: false,
+      reason: `Refused merge because itemModel differs: '${left.itemModel}' vs '${right.itemModel}'`,
+    };
+  }
+
   if (left.itemModel && right.itemModel && left.itemModel === right.itemModel) {
     if (
       left.customDataNormalized &&

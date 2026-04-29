@@ -1,12 +1,12 @@
 import { readFile } from 'node:fs/promises';
-import type { ContainerItemStack } from '../../utils/region/types';
 import { inferSourceDir, inferSourceStem } from '../../utils/fs';
 import { readContainerAt } from '../../utils/region';
 import { extractKnownFields, buildProbabilityMap } from './fields';
 import { scanSupplyDefinitionFiles } from './files';
 import { getSupplyPosZ, getSupplyRanges } from './parse';
+import { containerFilter, inferLocationName } from './utils';
 import type { SupplyDefinitionEvidence, SupplyScanResult } from './types';
-import { containerFilter, inferLocationName, isReplacementPlaceholder, isUniquePlaceholder } from './utils';
+import type { ContainerItemStack } from '../../utils/region/types';
 
 const SupplyPosX = 1029;
 const SupplyStoragePosY = 45;
@@ -31,7 +31,6 @@ const buildDefinitionFromItem = (
   locationName: string,
   ranges: SupplyDefinitionEvidence['slotRanges'],
   probability: number | undefined,
-  sourceLayer: 'template' | 'replacement' = layer,
 ): SupplyDefinitionEvidence => ({
   kind: 'supply_definition',
   sourcePath: filePath,
@@ -41,7 +40,7 @@ const buildDefinitionFromItem = (
   slot: item.slot >= 0 ? `container.${item.slot}` : undefined,
   layer,
   sourceSlot: item.slot,
-  sourceLayer,
+  sourceLayer: layer,
   locationName,
   slotRanges: ranges,
   probability,
@@ -96,63 +95,10 @@ export const extractItemDefinitionsFromSupply = async (
   return evidences;
 };
 
-const rebuildLogicalDefinitions = (
-  template: SupplyDefinitionEvidence[],
-  replacement: SupplyDefinitionEvidence[],
-): SupplyDefinitionEvidence[] => {
-  const replacementBySlot = new Map(replacement.map(item => [item.sourceSlot, item]));
-  const logical: SupplyDefinitionEvidence[] = [];
-
-  for (const item of template) {
-    const stack: ContainerItemStack = {
-      slot: item.sourceSlot,
-      id: item.baseItemId,
-      count: item.count,
-      components: item.rawComponents as unknown as Record<string, unknown>,
-    };
-
-    if (!isUniquePlaceholder(stack)) {
-      logical.push({
-        ...item,
-        layer: 'template',
-      });
-      continue;
-    }
-
-    const replacementItem = replacementBySlot.get(item.sourceSlot);
-    if (!replacementItem) {
-      continue;
-    }
-
-    const replacementStack: ContainerItemStack = {
-      slot: replacementItem.sourceSlot,
-      id: replacementItem.baseItemId,
-      count: replacementItem.count,
-      components: replacementItem.rawComponents as unknown as Record<string, unknown>,
-    };
-
-    if (isReplacementPlaceholder(replacementStack)) {
-      continue;
-    }
-
-    logical.push({
-      ...replacementItem,
-      layer: 'template',
-      probability: item.probability,
-      slotRanges: item.slotRanges,
-      sourceSlot: item.sourceSlot,
-      sourceLayer: 'replacement',
-    });
-  }
-
-  return logical;
-};
-
 export const scanItemDefinitions = async (): Promise<SupplyScanResult> => {
   const fileList = await scanSupplyDefinitionFiles();
   const template: SupplyDefinitionEvidence[] = [];
   const replacement: SupplyDefinitionEvidence[] = [];
-  const logical: SupplyDefinitionEvidence[] = [];
 
   for (const filePath of fileList) {
     const templateDefinitions = await extractItemDefinitionsFromSupply(filePath);
@@ -160,12 +106,10 @@ export const scanItemDefinitions = async (): Promise<SupplyScanResult> => {
 
     template.push(...templateDefinitions);
     replacement.push(...replacementDefinitions);
-    logical.push(...rebuildLogicalDefinitions(templateDefinitions, replacementDefinitions));
   }
 
   return {
     template,
     replacement,
-    logical,
   };
 };

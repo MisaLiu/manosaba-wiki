@@ -1,7 +1,8 @@
 import path from 'node:path';
-import { normalizeBaseItemId } from '../linker/normalizer';
+import { normalizeBaseItemId, normalizeCustomData, normalizeCustomName } from '../linker/normalizer';
 import type { ItemTriggerEvidence } from '../scanner/advancement/types';
 import type { ItemDefinitionEvidence } from '../scanner/item/types';
+import { getDefinitionDisplayName } from '../scanner/item/name';
 
 const EXCLUDED_PATH_SEGMENTS = [
   `${path.sep}function${path.sep}lobby${path.sep}`,
@@ -37,6 +38,31 @@ const isPlaceholderBaseItem = (baseItemId?: string): boolean => {
   return normalized === 'minecraft:air';
 };
 
+const SUPPLY_WEAK_IDENTITY_BASE_WHITELIST = new Set([
+  'minecraft:writable_book',
+]);
+
+const hasStrongDefinitionIdentity = (definition: ItemDefinitionEvidence): boolean => {
+  return Boolean(
+    definition.itemModel ||
+    normalizeCustomData(definition.customDataRaw) ||
+    getDefinitionDisplayName(definition)
+  );
+};
+
+const shouldIncludeSupplyDefinition = (definition: ItemDefinitionEvidence): boolean => {
+  if (hasStrongDefinitionIdentity(definition)) {
+    return true;
+  }
+
+  const baseItemId = normalizeBaseItemId(definition.baseItemId);
+  if (!baseItemId) {
+    return false;
+  }
+
+  return SUPPLY_WEAK_IDENTITY_BASE_WHITELIST.has(baseItemId);
+};
+
 const hasExcludedPathSegment = (sourcePath: string): boolean => {
   return EXCLUDED_PATH_SEGMENTS.some(segment => sourcePath.includes(segment));
 };
@@ -54,6 +80,10 @@ const hasExcludedSourceSegment = (sourceDir: string): boolean => {
 const shouldIncludeDefinition = (definition: ItemDefinitionEvidence): boolean => {
   if (isPlaceholderBaseItem(definition.baseItemId)) {
     return false;
+  }
+
+  if (definition.definitionSourceType === 'supply') {
+    return shouldIncludeSupplyDefinition(definition);
   }
 
   if (hasExcludedPathSegment(definition.sourcePath)) {

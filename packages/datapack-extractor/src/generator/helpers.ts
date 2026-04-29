@@ -2,6 +2,7 @@ import { normalizeCustomData, normalizeCustomName } from '../linker/normalizer';
 import type { LinkedItemCandidate } from '../linker/types';
 import type { VariantAnalysis, VariantDescriptor } from '../variants/types';
 import type { ItemDefinitionEvidence } from '../scanner/item/types';
+import { getDefinitionDisplayName } from '../scanner/item/name';
 import { getMinecraftLocalizedItemName } from './minecraft-name';
 import { getLoreDescription, getLoreTypeCandidates, parseLoreLines } from './lore';
 import { buildRichTextFromLore } from './rich-text';
@@ -28,7 +29,7 @@ export const toSlug = (value?: string): string | undefined => {
 };
 
 export const getCandidateNames = (candidate: LinkedItemCandidate): string[] => {
-  return compact(candidate.definitions.map(definition => normalizeCustomName(definition.customNameRaw)));
+  return compact(candidate.definitions.map(getDefinitionDisplayName));
 };
 
 const getReadableIdFallback = (candidate: LinkedItemCandidate): string | undefined => {

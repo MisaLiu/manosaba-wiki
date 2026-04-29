@@ -20,6 +20,7 @@ export const adaptSupplyDefinitionToItemDefinition = (
     count: definition.count,
     rawComponents: definition.rawComponents,
     itemModel: definition.itemModel,
+    itemNameRaw: definition.itemName,
     customNameRaw: definition.customName,
     loreRaw: definition.lore,
     customDataRaw: definition.customData,

@@ -1,6 +1,7 @@
 import { normalizeCustomData, normalizeCustomName } from '../linker/normalizer';
 import type { LinkedItemCandidate } from '../linker/types';
 import type { ItemIdentity } from '@manosaba/types';
+import { getDefinitionDisplayName } from '../scanner/item/name';
 
 export const buildIdentity = (candidate: LinkedItemCandidate): ItemIdentity | undefined => {
   const definition = candidate.definitions[0];
@@ -9,7 +10,7 @@ export const buildIdentity = (candidate: LinkedItemCandidate): ItemIdentity | un
   const identity: ItemIdentity = {
     baseItemId: definition.baseItemId,
     itemModel: definition.itemModel,
-    customName: normalizeCustomName(definition.customNameRaw),
+    customName: getDefinitionDisplayName(definition),
     customData: normalizeCustomData(definition.customDataRaw),
   };
 

@@ -1,9 +1,10 @@
 import { normalizeCustomData, normalizeCustomName } from '../linker/normalizer';
 import type { ItemDefinitionEvidence } from '../scanner/item/types';
 import type { ItemTriggerEvidence } from '../scanner/advancement/types';
+import { getDefinitionDisplayName } from '../scanner/item/name';
 
 export const getDefinitionName = (definition: ItemDefinitionEvidence): string | undefined => {
-  return normalizeCustomName(definition.customNameRaw);
+  return getDefinitionDisplayName(definition);
 };
 
 export const getTriggerName = (trigger: ItemTriggerEvidence): string | undefined => {

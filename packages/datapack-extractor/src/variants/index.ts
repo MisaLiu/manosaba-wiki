@@ -1,5 +1,5 @@
 import type { LinkResult } from '../linker/types';
-import { normalizeCustomName } from '../linker/normalizer';
+import { getDefinitionDisplayName } from '../scanner/item/name';
 import { detectModelStateVariants } from './modelState';
 import { detectParametricVariants } from './parametric';
 import { detectStateVariants } from './state';
@@ -9,7 +9,7 @@ const buildContext = (result: LinkResult, index: number): VariantContext => {
   const candidate = result.linkedItems[index];
   const candidateNames = new Set(
     candidate.definitions
-      .map(definition => normalizeCustomName(definition.customNameRaw))
+      .map(getDefinitionDisplayName)
       .filter((value): value is string => Boolean(value))
   );
 
@@ -18,7 +18,7 @@ const buildContext = (result: LinkResult, index: number): VariantContext => {
     definitions: candidate.definitions,
     triggers: candidate.triggers,
     parametricDefinitions: result.parametricDefinitions.filter((definition) => {
-      const definitionName = normalizeCustomName(definition.customNameRaw);
+      const definitionName = getDefinitionDisplayName(definition);
       return Boolean(definitionName && candidateNames.has(definitionName));
     }),
   };

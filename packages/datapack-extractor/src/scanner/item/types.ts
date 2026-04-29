@@ -34,6 +34,7 @@ export interface ItemDefinitionEvidence {
   rawComponents?: Record<string, string>;
 
   itemModel?: string,
+  itemNameRaw?: unknown,
   customNameRaw?: unknown,
   loreRaw?: unknown,
   customDataRaw?: unknown,

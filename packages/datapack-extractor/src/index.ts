@@ -18,7 +18,8 @@ export const buildArtifacts = async () => {
   const supplyDefinitions = await scanSupplyDefinitions();
   const datapackDefinitions = await scanDatapackItemDefinitions();
   const allDefinitions = [
-    ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.logical),
+    ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.template),
+    ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.replacement),
     ...datapackDefinitions,
   ];
   const allTriggers = await scanItemTriggerEvidence();

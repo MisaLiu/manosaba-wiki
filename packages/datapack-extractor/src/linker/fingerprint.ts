@@ -2,6 +2,7 @@ import { normalizeBaseItemId, normalizeCustomData, normalizeCustomName } from '.
 import type { ItemFingerprint } from './types';
 import type { ItemDefinitionEvidence } from '../scanner/item/types';
 import type { ItemTriggerEvidence } from '../scanner/advancement/types';
+import { getDefinitionDisplayName } from '../scanner/item/name';
 
 interface FingerprintBuildResult {
   fingerprint: ItemFingerprint;
@@ -27,7 +28,7 @@ export const buildDefinitionFingerprint = (
     baseItemId: normalizeBaseItemId(definition.baseItemId),
     itemModel: definition.itemModel?.trim(),
     customDataNormalized: normalizeCustomData(definition.customDataRaw),
-    customNameNormalized: normalizeCustomName(definition.customNameRaw),
+    customNameNormalized: getDefinitionDisplayName(definition),
     namespace: definition.namespace,
     sourceStem: definition.sourceStem,
   };
