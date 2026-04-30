@@ -1,6 +1,7 @@
 import { buildDefinitionFingerprint, buildTriggerFingerprint } from './fingerprint';
 import { parseLoreLines } from '../generator/lore';
 import { matchFingerprints } from './rules';
+import { getDefinitionDisplayName } from '../scanner/item/name';
 import type {
   ItemFingerprint,
   LinkedItemCandidate,
@@ -24,6 +25,20 @@ interface DefinitionMatchCandidate {
   candidateIndex: number;
   match: LinkMatch;
 }
+
+interface FamilyMergeRule {
+  name: string;
+  primaryModel: string;
+  secondaryModel: string;
+}
+
+const FAMILY_MERGE_RULES: FamilyMergeRule[] = [
+  {
+    name: '传送锚',
+    primaryModel: 'manosaba:empty_anchor',
+    secondaryModel: 'manosaba:anchor',
+  },
+];
 
 const hasAnyIdentity = (fingerprint: ItemFingerprint): boolean => {
   return Boolean(
@@ -362,6 +377,60 @@ const createSupplyCandidates = (
   return createDefinitionCandidates(discoveryDefinitions);
 };
 
+const candidateHasItemModel = (candidate: LinkedItemCandidate, itemModel: string): boolean => {
+  return candidate.definitions.some(definition => definition.itemModel === itemModel);
+};
+
+const candidateHasDisplayName = (candidate: LinkedItemCandidate, name: string): boolean => {
+  return candidate.definitions.some(definition => getDefinitionDisplayName(definition) === name);
+};
+
+const mergeCandidateState = (target: CandidateState, source: CandidateState): void => {
+  target.candidate.definitions.push(...source.candidate.definitions);
+  target.candidate.fingerprints.push(...source.candidate.fingerprints);
+  target.candidate.warnings.push(...source.candidate.warnings);
+  target.definitionFingerprints.push(...source.definitionFingerprints);
+};
+
+const mergeKnownFamilies = (candidates: CandidateState[]): CandidateState[] => {
+  const merged = [...candidates];
+  const removedIndexes = new Set<number>();
+
+  for (const rule of FAMILY_MERGE_RULES) {
+    for (let i = 0; i < merged.length; i++) {
+      if (removedIndexes.has(i)) continue;
+
+      const primary = merged[i];
+      if (
+        !candidateHasItemModel(primary.candidate, rule.primaryModel) ||
+        !candidateHasDisplayName(primary.candidate, rule.name)
+      ) {
+        continue;
+      }
+
+      for (let j = 0; j < merged.length; j++) {
+        if (i === j || removedIndexes.has(j)) continue;
+
+        const secondary = merged[j];
+        if (
+          !candidateHasItemModel(secondary.candidate, rule.secondaryModel) ||
+          !candidateHasDisplayName(secondary.candidate, rule.name)
+        ) {
+          continue;
+        }
+
+        mergeCandidateState(primary, secondary);
+        primary.candidate.warnings.push(
+          `Merged family '${rule.name}' by whitelist: '${rule.primaryModel}' + '${rule.secondaryModel}'`
+        );
+        removedIndexes.add(j);
+      }
+    }
+  }
+
+  return merged.filter((_, index) => !removedIndexes.has(index));
+};
+
 const attachDefinitionsToCandidates = (
   candidates: CandidateState[],
   definitions: ItemDefinitionEvidence[]
@@ -443,7 +512,7 @@ export const linkItemEvidence = (
     supplyCandidates,
     datapackDefinitions.filter(definition => !isTemplateDefinition(definition))
   );
-  const candidates = supplyCandidates;
+  const candidates = mergeKnownFamilies(supplyCandidates);
 
   const unlinkedTriggers: ItemTriggerEvidence[] = [];
   const nonItemTriggers: ItemTriggerEvidence[] = [];
