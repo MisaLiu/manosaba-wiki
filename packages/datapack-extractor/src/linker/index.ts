@@ -356,8 +356,10 @@ const createDefinitionCandidates = (
 const createSupplyCandidates = (
   definitions: ItemDefinitionEvidence[]
 ): CandidateState[] => {
-  const supplyDefinitions = definitions.filter(definition => definition.definitionSourceType === 'supply');
-  return createDefinitionCandidates(supplyDefinitions);
+  const discoveryDefinitions = definitions.filter(
+    definition => definition.definitionSourceType === 'supply' || definition.definitionSourceType === 'recipe'
+  );
+  return createDefinitionCandidates(discoveryDefinitions);
 };
 
 const attachDefinitionsToCandidates = (
@@ -432,9 +434,11 @@ export const linkItemEvidence = (
 ): LinkResult => {
   const parametricDefinitions = definitions.filter(isParametricDefinition);
   const templateDefinitions = definitions.filter(definition => isTemplateDefinition(definition) && !isParametricDefinition(definition));
-  const supplyDefinitions = definitions.filter(definition => definition.definitionSourceType === 'supply');
-  const datapackDefinitions = definitions.filter(definition => definition.definitionSourceType !== 'supply');
-  const supplyCandidates = createSupplyCandidates(supplyDefinitions);
+  const discoveryDefinitions = definitions.filter(
+    definition => definition.definitionSourceType === 'supply' || definition.definitionSourceType === 'recipe'
+  );
+  const datapackDefinitions = definitions.filter(definition => definition.definitionSourceType === 'mcfunction');
+  const supplyCandidates = createSupplyCandidates(discoveryDefinitions);
   const unlinkedDatapackDefinitions = attachDefinitionsToCandidates(
     supplyCandidates,
     datapackDefinitions.filter(definition => !isTemplateDefinition(definition))

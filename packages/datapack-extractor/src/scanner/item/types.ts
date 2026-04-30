@@ -22,7 +22,7 @@ export interface ItemDefinitionEvidence {
   sourceDir: string,
   namespace: string,
 
-  definitionSourceType: 'mcfunction' | 'supply',
+  definitionSourceType: 'mcfunction' | 'supply' | 'recipe',
   commandType: ItemCommandType,
   slot?: string,
   layer?: 'template' | 'replacement',

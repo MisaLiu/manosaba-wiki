@@ -4,6 +4,7 @@ import { filterIngameItemDefinitions, filterIngameItemTriggers } from './filter/
 import { generateItems } from './generator/index';
 import { generateRecipes } from './generator/recipes';
 import { linkItemEvidence } from './linker/index';
+import { adaptRecipeResultsToItemDefinitions } from './scanner/recipe/adapter';
 import { scanRecipes } from './scanner/recipe';
 import { scanItemDefinitions as scanDatapackItemDefinitions } from './scanner/item';
 import { adaptSupplyDefinitionsToItemDefinitions } from './scanner/supply/adapter';
@@ -17,13 +18,14 @@ const RECIPES_OUTPUT_PATH = path.resolve(process.cwd(), 'dist/recipes.json');
 export const buildArtifacts = async () => {
   const supplyDefinitions = await scanSupplyDefinitions();
   const datapackDefinitions = await scanDatapackItemDefinitions();
+  const recipes = await scanRecipes();
   const allDefinitions = [
     ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.template),
     ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.replacement),
+    ...adaptRecipeResultsToItemDefinitions(recipes),
     ...datapackDefinitions,
   ];
   const allTriggers = await scanItemTriggerEvidence();
-  const recipes = await scanRecipes();
 
   const definitions = filterIngameItemDefinitions(allDefinitions);
   const triggers = filterIngameItemTriggers(allTriggers);
