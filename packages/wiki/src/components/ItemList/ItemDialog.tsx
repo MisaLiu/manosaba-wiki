@@ -41,9 +41,25 @@ export const ItemDialog = ({ item }: ItemDialogProps) => {
       </div>
 
       {variant && variant.variants.length > 1 && (
-        <div class="pb-2">
+        <div class="pb-2 flex flex-nowrap gap-2 overflow-y-hidden overflow-x-auto w-full">
           {variant.variants.map((variant, index) => (
-            <button onClick={() => switchVariant(index)}>{variant.stateValue ?? variant.slug}</button>
+            <button
+              class={[
+                'min-w-8',
+                'px-2',
+                'transition',
+                'transition-linear',
+                'duration-100',
+                'border',
+                'border-gray-600',
+                'hover:border-gray-500',
+                'rounded-md',
+                'bg-gray-800',
+                'hover:bg-gray-700',
+                'cursor-pointer',
+              ].join(' ')}
+              onClick={() => switchVariant(index)}
+            >{variant.stateValue ?? variant.slug}</button>
           ))}
         </div>
       )}

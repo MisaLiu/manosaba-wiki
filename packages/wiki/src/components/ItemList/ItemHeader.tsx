@@ -1,3 +1,4 @@
+import { ItemTag } from './ItemTag';
 import type { ItemType } from '@manosaba/types';
 
 type ItemCardHeaderProps = {
@@ -9,17 +10,13 @@ type ItemCardHeaderProps = {
 export const ItemCardHeader = ({
   name,
   types,
-  icon,
+  // icon, // TODO
 }: ItemCardHeaderProps) => {
   return (
     <div>
       <div class="text-xl truncate">{name}</div>
       {types && types.length > 0 && (
-        <div class="text-gray-500 truncate">
-          {types.map((type) => (
-            <span>{type}</span>
-          ))}
-        </div>
+        <ItemTag tags={types} />
       )}
     </div>
   );
