@@ -50,7 +50,7 @@ jobs:
     - name: Copy extracted info
       run: |
         mkdir -p packages/wiki/public
-        cp packages/datapack-extractor/*.json packages/wiki/public
+        cp packages/datapack-extractor/dist/*.json packages/wiki/public/
 
     - name: Build wiki page
       working-directory: packages/wiki

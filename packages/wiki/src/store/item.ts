@@ -21,7 +21,7 @@ export const useItemStore = create<ItemStore>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch('/items.json');
+      const response = await fetch('items.json');
       const items = await response.json();
       console.log(items);
       set({ items, loading: false });
