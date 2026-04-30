@@ -1,27 +1,54 @@
+import { useState } from 'preact/hooks';
 import { ItemCardHeader } from './ItemHeader';
 import { MCRichText } from '../MCRichText/MCRichText';
-import type { Item } from '@manosaba/types';
+import type { Item, RichTextDocument } from '@manosaba/types';
 
 type ItemDialogProps = {
   item: Item,
 };
 
 export const ItemDialog = ({ item }: ItemDialogProps) => {
+  const [ name, setName ] = useState<string>(item.name);
+  const [ description, setDiscription ] = useState<RichTextDocument>(item.descriptionRich);
+
   const {
-    descriptionRich,
-    sources
+    variant,
+    sources,
   } = item;
+
+  const switchVariant = (index: number) => {
+    if (index < 0) {
+      setName(item.name);
+      setDiscription(item.descriptionRich);
+    }
+
+    const _variant = variant.variants[index];
+    if (!_variant) return;
+
+    if (_variant.name) setName(_variant.name);
+    if (_variant.descriptionRich) setDiscription(_variant.descriptionRich);
+  };
+
+  console.log(item);
 
   return (
     <div class="p-4">
       <div class="pb-2">
         <ItemCardHeader
-          name={item.name}
+          name={name}
           types={item.types}
         />
       </div>
 
-      <MCRichText document={descriptionRich} />
+      {variant && variant.variants.length > 1 && (
+        <div class="pb-2">
+          {variant.variants.map((variant, index) => (
+            <button onClick={() => switchVariant(index)}>{variant.stateValue ?? variant.slug}</button>
+          ))}
+        </div>
+      )}
+
+      <MCRichText document={description} />
 
       {sources && sources.length > 0 && (
         <div class="pt-2">
