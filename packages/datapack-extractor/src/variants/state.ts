@@ -102,6 +102,27 @@ const buildFallbackDescriptor = (
   };
 };
 
+const dedupeVariantsById = (variants: VariantDescriptor[]): VariantDescriptor[] => {
+  const merged = new Map<string, VariantDescriptor>();
+
+  for (const variant of variants) {
+    const existing = merged.get(variant.id);
+    if (!existing) {
+      merged.set(variant.id, variant);
+      continue;
+    }
+
+    merged.set(variant.id, {
+      ...existing,
+      definitionIndexes: unique([...existing.definitionIndexes, ...variant.definitionIndexes]),
+      triggerIndexes: unique([...existing.triggerIndexes, ...variant.triggerIndexes]),
+      warnings: unique([...existing.warnings, ...variant.warnings]),
+    });
+  }
+
+  return Array.from(merged.values());
+};
+
 export const detectStateVariants = (context: VariantContext): VariantAnalysis | undefined => {
   const definitionGroups = groupDefinitionsByState(context.definitions);
   const triggerGroups = groupTriggersByState(context.triggers);
@@ -139,7 +160,7 @@ export const detectStateVariants = (context: VariantContext): VariantAnalysis | 
     .map(index => buildFallbackDescriptor(context.candidate.id, index, context))
     .filter((variant): variant is VariantDescriptor => Boolean(variant));
 
-  const allVariants = [...variants, ...fallbackVariants];
+  const allVariants = dedupeVariantsById([...variants, ...fallbackVariants]);
   const allUsedDefinitionIndexes = allVariants.flatMap(variant => variant.definitionIndexes);
 
   return {
