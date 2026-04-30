@@ -10,7 +10,7 @@ type ItemDialogProps = {
 
 export const ItemDialog = ({ item }: ItemDialogProps) => {
   const [ name, setName ] = useState<string>(item.name);
-  const [ description, setDiscription ] = useState<RichTextDocument>(item.descriptionRich);
+  const [ description, setDiscription ] = useState<RichTextDocument | undefined>(item.descriptionRich);
 
   const {
     variant,
@@ -22,6 +22,8 @@ export const ItemDialog = ({ item }: ItemDialogProps) => {
       setName(item.name);
       setDiscription(item.descriptionRich);
     }
+
+    if (!variant) return;
 
     const _variant = variant.variants[index];
     if (!_variant) return;

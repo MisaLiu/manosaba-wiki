@@ -35,5 +35,5 @@ export const getLocationName = (id: string) => {
 };
 
 export const getItemType = (id: string) => {
-  return ItemTypeMap[id] ?? ItemTypeMap.unknown;
+  return ItemTypeMap[id as ItemType] ?? ItemTypeMap.unknown;
 };

@@ -38,9 +38,7 @@ export const ItemCard = ({ item }: ItemCardProps) => {
         />
       </div>
 
-      <div>
-        <MCRichText document={item.descriptionRich ?? null} />
-      </div>
+      <MCRichText document={item.descriptionRich} />
     </div>
   );
 };

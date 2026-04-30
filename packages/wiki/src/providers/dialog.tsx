@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
+import type { ComponentChild } from 'preact';
+import type { EventDetailed } from '../types';
 
 export const dialogBus = new EventTarget();
 
 export const DialogProvider = () => {
-  const [ dialog, setDialog ] = useState(null);
+  const [ dialog, setDialog ] = useState<ComponentChild | null>(null);
 
-  const openHandler = (e) => {
+  const openHandler = (e: EventDetailed<ComponentChild>) => {
     setDialog(e.detail);
   };
 
