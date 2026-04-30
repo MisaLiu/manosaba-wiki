@@ -3,7 +3,7 @@
   column-gap: calc(var(--spacing) * 4);
 }
 
-@media (min-width: 420px) {
+@media (min-width: 450px) {
   .item-list {
     column-count: 2;
   }
@@ -18,6 +18,12 @@
 @media (min-width: 1024px) {
   .item-list {
     column-count: 4;
+  }
+}
+
+@media (min-width: 1500px) {
+  .item-list {
+    column-count: 5;
   }
 }
 
