@@ -45,7 +45,25 @@ export const extractItemTriggerEvidenceFromFile = async (
   filePath: string
 ): Promise<ItemTriggerEvidence[]> => {
   const content = await readFile(filePath, { encoding: 'utf8' });
-  const parsed = JSON.parse(content) as Record<string, unknown>;
+  let parsed: Record<string, unknown>;
+
+  try {
+    parsed = JSON.parse(content) as Record<string, unknown>;
+  } catch (error) {
+    return [{
+      kind: 'item_trigger',
+      sourcePath: filePath,
+      sourceStem: inferSourceStem(filePath),
+      sourceDir: inferSourceDir(filePath),
+      namespace: inferNamespace(filePath),
+      advancementId: inferAdvancementId(filePath),
+      criterionName: 'invalid_json',
+      triggerType: 'unknown',
+      warnings: [
+        `Advancement JSON parse failed: ${(error as Error).message ?? String(error)}`,
+      ],
+    }];
+  }
 
   const criteria =
     parsed.criteria && typeof parsed.criteria === 'object' && !Array.isArray(parsed.criteria)

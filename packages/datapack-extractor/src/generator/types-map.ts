@@ -10,6 +10,7 @@ const TYPE_MAP: Record<string, ItemType> = {
   consume: 'consumable',
   food: 'food',
   medicine: 'medicine',
+  'YP-tech medicine': 'medicine',
   utility: 'utility',
   props: 'utility',
   'magic props': 'magical_utility',
@@ -18,7 +19,6 @@ const TYPE_MAP: Record<string, ItemType> = {
   clue: 'clue',
   clues: 'clue',
   magic: 'magic',
-  quest: 'quest',
 };
 
 export const splitRawTypes = (value?: string): string[] => {
