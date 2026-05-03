@@ -10,7 +10,7 @@ const TYPE_MAP: Record<string, ItemType> = {
   consume: 'consumable',
   food: 'food',
   medicine: 'medicine',
-  'YP-tech medicine': 'medicine',
+  'yp-tech medicine': 'medicine',
   utility: 'utility',
   props: 'utility',
   'magic props': 'magical_utility',
