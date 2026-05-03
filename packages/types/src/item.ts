@@ -37,6 +37,31 @@ export interface CraftingSource {
 
 export type ItemSource = LocationSource | CraftingSource;
 
+export interface WeaponStat {
+  attribute: string
+  amount: number
+  operation: string
+}
+
+export interface WeaponSpawnCount {
+  mode: 'random' | 'all'
+  below10?: [number, number]
+  above10?: [number, number]
+  fixed?: number
+}
+
+export interface WeaponInfo {
+  rooms: Record<string, number>
+  cost: number
+  spawnCount: WeaponSpawnCount
+  durability: number
+  stats: WeaponStat[]
+  baseItemId: string
+  damageType?: 'sharp' | 'blunt'
+  consumable?: boolean
+  useCooldown?: { group: string; seconds: number }
+}
+
 export interface EffectReward {
   type: 'effect',
   id: string,
@@ -103,5 +128,6 @@ export interface Item {
   sources?: ItemSource[],
   rewardGroups?: RewardGroup[],
   variant?: ItemVariantGroup,
+  weapon?: WeaponInfo,
   warnings?: string[],
 }

@@ -508,11 +508,28 @@ export const linkItemEvidence = (
   );
   const datapackDefinitions = definitions.filter(definition => definition.definitionSourceType === 'mcfunction');
   const supplyCandidates = createSupplyCandidates(discoveryDefinitions);
+
   const unlinkedDatapackDefinitions = attachDefinitionsToCandidates(
     supplyCandidates,
     datapackDefinitions.filter(definition => !isTemplateDefinition(definition))
   );
-  const candidates = mergeKnownFamilies(supplyCandidates);
+
+  const isWeaponDefinition = (definition: ItemDefinitionEvidence): boolean =>
+    definition.sourcePath.includes('/weapon/main/summon/');
+
+  const weaponCandidates = createDefinitionCandidates(
+    unlinkedDatapackDefinitions.filter(isWeaponDefinition)
+  );
+
+  for (let i = 0; i < weaponCandidates.length; i++) {
+    weaponCandidates[i].candidate.id = `weapon:${i}`;
+  }
+
+  const remainingUnlinked = unlinkedDatapackDefinitions.filter(
+    definition => !isWeaponDefinition(definition)
+  );
+
+  const candidates = [...mergeKnownFamilies(supplyCandidates), ...weaponCandidates];
 
   const unlinkedTriggers: ItemTriggerEvidence[] = [];
   const nonItemTriggers: ItemTriggerEvidence[] = [];
@@ -558,7 +575,7 @@ export const linkItemEvidence = (
   const unlinkedDefinitions = linkedItems
     .filter(candidate => candidate.triggers.length === 0)
     .flatMap(candidate => candidate.definitions)
-    .concat(unlinkedDatapackDefinitions);
+    .concat(remainingUnlinked);
 
   return {
     linkedItems,
