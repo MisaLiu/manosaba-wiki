@@ -51,7 +51,15 @@ export const ItemList = () => {
       })
       .filter((item) => {
         if (filterLocations.length <= 0) return true;
+
+        if (item.weapon) {
+          return (
+            Object.keys(item.weapon.rooms).filter(e => filterLocations.findIndex(i => e === i) !== -1).length > 0
+          );
+        }
+
         if (!item.sources || item.sources.length <= 0) return false;
+
         return (
           item.sources.filter((e) => e.type === 'location' && filterLocations.findIndex(i => e.name === i) !== -1).length > 0
         );
