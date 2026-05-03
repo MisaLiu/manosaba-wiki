@@ -1,5 +1,6 @@
 import { useState } from 'preact/hooks';
 import { ItemCardHeader } from './ItemHeader';
+import { ItemWeapon } from './ItemWeapon';
 import { MCRichText } from '../MCRichText/MCRichText';
 import { getLocationName } from '../../const';
 import type { Item, RichTextDocument } from '@manosaba/types';
@@ -15,6 +16,7 @@ export const ItemDialog = ({ item }: ItemDialogProps) => {
   const {
     variant,
     sources,
+    weapon
   } = item;
 
   const switchVariant = (index: number) => {
@@ -91,6 +93,10 @@ export const ItemDialog = ({ item }: ItemDialogProps) => {
             <div>本物品拥有合成配方</div>
           )}
         </div>
+      )}
+
+      {weapon && (
+        <ItemWeapon info={weapon} />
       )}
     </div>
   )

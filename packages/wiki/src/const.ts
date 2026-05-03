@@ -13,6 +13,16 @@ export const LocationMap: Readonly<Record<string, string>> = {
   'noah_studio': '诺亚画室',
   'infirmary': '医务室',
   'museum': '展览室',
+  'punishment_room': '惩戒室',
+  'guest_room': '客房',
+  'reception_room': '半地下会客室',
+  'toilet': '厕所',
+  'lobby_1st': '一楼大厅',
+  'liveroom_1st': '一楼客厅',
+  'hallway_1st': '一楼走廊',
+  'lobby_2nd': '二楼大厅',
+  'liveroom_2nd': '二楼客厅',
+  'hallway_2nd': '二楼走廊'
 };
 
 export const ItemTypeMap: Readonly<Record<ItemType, string>> = {
