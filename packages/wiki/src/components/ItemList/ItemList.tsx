@@ -59,7 +59,7 @@ export const ItemList = () => {
         if (!item.sources || item.sources.length <= 0) return false;
 
         return (
-          item.sources.filter((e) => e.type === 'location' && filterLocations.findIndex(i => e.name === i) !== -1).length > 0
+          item.sources.filter((e) => (e.type === 'location' || e.type === 'task_reward') && filterLocations.findIndex(i => e.name === i) !== -1).length > 0
         );
       })
   );
