@@ -50,6 +50,8 @@ export const DialogProvider = () => {
           'text-gray-64',
           'min-w-80',
           'max-w-4xl',
+          'max-h-85vh',
+          'overflow-y-auto',
           `${dialog ? 'opacity-100' : 'opacity-0'}`,
           `${dialog ? 'pointer-events-auto' : 'pointer-events-none'}`,
           `${dialog ? 'open' : 'closed'}`

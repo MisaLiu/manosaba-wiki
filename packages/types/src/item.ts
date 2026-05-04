@@ -38,6 +38,8 @@ export interface CraftingSource {
 export interface TaskRewardSource {
   type: 'task_reward',
   name: string,
+  role?: 'civil' | 'werewolf' | 'third_party',
+  count?: number,
   probability?: number,
 }
 

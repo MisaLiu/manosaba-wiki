@@ -19,17 +19,27 @@ const ItemSourceWithLocation = ({
             {getLocationName(source.name)}
             <span class="text-gray-400">&nbsp;|&nbsp;</span>
             {Math.round((source.probability ?? 1) * 1000) / 10}%
-            {source.type === 'location' && (
-              <>
                 {source.count && source.count > 1 && (
                   <>
                     <span class="text-gray-400">×</span>
                     {source.count} 个
                   </>
                 )}
+            {source.type === 'location' && (
+              <>
                 <span class="text-gray-400">&nbsp;(</span>
                 <>{Math.ceil(1 / (source.probability ?? 1))}&nbsp;</>
                 <span class="text-gray-400">次尝试)</span>
+              </>
+            )}
+            {source.type === 'task_reward' && source.role && (
+              <>
+                <span class="text-gray-400">&nbsp;|&nbsp;</span>
+                {
+                  source.role === 'werewolf' ? '魔女/共犯' :
+                  source.role === 'third_party' ? '杀意魔女' :
+                  '预备魔女'
+                }
               </>
             )}
           </div>

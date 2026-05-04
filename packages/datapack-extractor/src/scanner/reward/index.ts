@@ -39,7 +39,7 @@ const buildDefinitionFromItem = (
     layer,
     sourceSlot: item.slot,
     sourceLayer: layer,
-    locationName: loc.roomId,
+    locationName: `${loc.x}:${loc.roomId}`,
     probability: REWARD_PROBABILITY,
     baseItemId: item.id,
     count: item.count,
