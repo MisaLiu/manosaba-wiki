@@ -84,6 +84,7 @@ export const ItemDialog = ({ item }: ItemDialogProps) => {
         <ItemCardHeader
           name={name}
           types={item.types}
+          textureKey={item.textureKey}
         />
       </div>
 

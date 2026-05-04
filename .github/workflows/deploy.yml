@@ -7,6 +7,10 @@ on:
         description: 'URL of the world zip file'
         required: true
         type: string
+      res_url:
+        description: 'URL of the resource pack file'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -42,6 +46,12 @@ jobs:
         mkdir world && cd world
         wget "${{ github.event.inputs.world_url }}" -O world.zip
         unzip world.zip
+    
+    - name: Download and unzip resource pack
+      run: |
+        mkdir resourcepack && cd resourcepack
+        wget "${{ github.event.inputs.res_url }}" -O resourcepack.zip
+        unzip resourcepack.zip
 
     - name: Extract info from world
       working-directory: packages/datapack-extractor
@@ -51,6 +61,8 @@ jobs:
       run: |
         mkdir -p packages/wiki/public
         cp packages/datapack-extractor/dist/*.json packages/wiki/public/
+        mkdir -p packages/wiki/public/textures
+        cp -r packages/datapack-extractor/dist/textures/* packages/wiki/public/textures/
 
     - name: Build wiki page
       working-directory: packages/wiki

@@ -1,7 +1,6 @@
 import { Link } from 'wouter-preact';
 import { MCRichText } from '../MCRichText/MCRichText';
 import { ItemCardHeader } from './ItemHeader';
-import { ItemTag } from './ItemTag';
 import type { Item, LocationSource } from '@manosaba/types';
 
 type ItemCardProps = {
@@ -45,30 +44,13 @@ export const ItemCard = ({ item, source }: ItemCardProps) => {
     <Link
       href={`/item/${item.id}`}
       class={`block p-4 transition transition-linear duration-100 border rounded-md cursor-pointer item-list-card w-full text-left ${getRarityClasses()}`}
-    >      <div class="pb-2">
-        {source ? (
-          <div>
-            <div class="flex items-center justify-between gap-2 pb-1">
-              <div class="flex items-baseline gap-1 min-w-0">
-                <div class="text-xl truncate">{item.name}</div>
-                {source.count && source.count > 1 && (
-                  <span class="text-xs text-gray-500 shrink-0">(x{source.count})</span>
-                )}
-              </div>
-              <div class="rounded-full border border-gray-600 bg-gray-900 px-2 py-0.5 text-xs text-gray-300 shrink-0 whitespace-nowrap">
-                {Math.round((source.probability ?? 1) * 1000) / 10}%
-              </div>
-            </div>
-            {item.types && item.types.length > 0 && (
-              <ItemTag tags={item.types} />
-            )}
-          </div>
-        ) : (
-          <ItemCardHeader
-            name={item.name}
-            types={item.types}
-          />
-        )}
+    >
+      <div class="pb-2">
+        <ItemCardHeader
+          name={item.name}
+          types={item.types}
+          textureKey={item.textureKey}
+        />
       </div>
 
       <MCRichText document={item.descriptionRich} />

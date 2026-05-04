@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'preact/hooks';
+import { useState, useMemo, useEffect } from 'preact/hooks';
 import { useRoute, useLocation } from 'wouter-preact';
 import { ItemTypeMap, LocationMap } from '../../const';
 import { useItemStore } from '../../store/item';
@@ -6,6 +6,7 @@ import { SearchBar } from '../SearchBar/SearchBar';
 import { ItemFilter } from './ItemFilter';
 import { ItemCard } from './ItemCard';
 import { ItemDialog } from './ItemDialog';
+import { lockScreen, unlockScreen } from '../../screen';
 import type { ItemSource, LocationSource } from '@manosaba/types';
 import type { SearchIndex } from '../SearchBar/SearchBar';
 import './style.css';
@@ -94,6 +95,11 @@ export const ItemList = () => {
     });
   };
 
+  useEffect(() => {
+    if (match) lockScreen();
+    else unlockScreen();
+  }, [match]);
+
   return (
     <>
       <div>
@@ -129,7 +135,7 @@ export const ItemList = () => {
         class={`fixed inset-0 bg-black transition-opacity duration-300 z-0 ${
           selectedItem ? 'opacity-50' : 'opacity-0 pointer-events-none'
         }`}
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/item')}
       />
 
       <div
