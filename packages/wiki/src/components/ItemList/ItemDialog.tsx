@@ -15,7 +15,7 @@ const ItemSourceWithLocation = ({
         .map((source) => (
           <div class="pl-1em text-gray-200">
             {source.type === 'location' ? '搜索获得' : '任务奖励'}
-            <span class="text-gray-400">·</span>
+            <span class="text-gray-400">&nbsp;·&nbsp;</span>
             {getLocationName(source.name)}
             <span class="text-gray-400">&nbsp;|&nbsp;</span>
             {Math.round((source.probability ?? 1) * 1000) / 10}%
