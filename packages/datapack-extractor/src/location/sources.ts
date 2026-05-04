@@ -1,4 +1,4 @@
-import type { ItemSource, LocationSource } from '@manosaba/types';
+import type { ItemSource, LocationSource, TaskRewardSource } from '@manosaba/types';
 import type { LinkedItemCandidate } from '../linker/types';
 import type { ItemDefinitionEvidence } from '../scanner/item/types';
 
@@ -12,35 +12,43 @@ const buildLocationSource = (definition: ItemDefinitionEvidence): LocationSource
   };
 };
 
-const buildLocationSourceKey = (source: LocationSource): string => {
-  return [
-    source.name,
-    source.count ?? '',
-    source.implementation ?? '',
-    source.lootTableId ?? '',
-  ].join('|');
+const buildTaskRewardSource = (definition: ItemDefinitionEvidence): TaskRewardSource => {
+  return {
+    type: 'task_reward',
+    name: definition.locationName ?? 'unknown',
+    probability: definition.probability,
+  };
+};
+
+const buildSourceKey = (source: ItemSource): string => {
+  if (source.type === 'task_reward') return `reward|${source.name}`;
+  return [(source as LocationSource).name, (source as LocationSource).count ?? '', (source as LocationSource).implementation ?? '', (source as LocationSource).lootTableId ?? ''].join('|');
 };
 
 export const buildLocationSourcesForCandidate = (
   candidate: LinkedItemCandidate,
   _supplies: unknown[] = [],
 ): ItemSource[] => {
-  const aggregated = new Map<string, LocationSource>();
+  const aggregated = new Map<string, ItemSource>();
 
   for (const definition of candidate.definitions) {
     if (definition.definitionSourceType !== 'supply') {
       continue;
     }
 
-    const source = buildLocationSource(definition);
-    const key = buildLocationSourceKey(source);
-    const existing = aggregated.get(key);
+    const isReward = definition.namespace === 'reward';
+    const source: ItemSource = isReward
+      ? buildTaskRewardSource(definition)
+      : buildLocationSource(definition);
+
+    const key = buildSourceKey(source);
+    const existing = aggregated.get(key) as LocationSource | TaskRewardSource;
 
     if (existing) {
       aggregated.set(key, {
         ...existing,
-        probability: (existing.probability ?? 0) + (source.probability ?? 0),
-      });
+        probability: ((existing.probability ?? 0) + (source.probability ?? 0)),
+      } as LocationSource | TaskRewardSource);
       continue;
     }
 

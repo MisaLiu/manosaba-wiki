@@ -50,32 +50,33 @@ export const augmentItemsWithWeaponInfo = (
   weapons: WeaponScanData[],
 ): Item[] => {
   const modelMap = new Map<string, WeaponScanData>()
-  const baseItemMap = new Map<string, WeaponScanData[]>()
 
   for (const w of weapons) {
     const model = (w.itemData.components['minecraft:item_model'] as string) ?? ''
     if (model) {
       modelMap.set(model, w)
     }
-    const baseId = w.itemData.baseItemId
-    if (!baseItemMap.has(baseId)) baseItemMap.set(baseId, [])
-    baseItemMap.get(baseId)!.push(w)
+  }
+
+  const getWeaponName = (w: WeaponScanData): string | undefined => {
+    const customName = w.itemData.components['minecraft:custom_name'] as { text?: string } | undefined
+    return customName?.text
   }
 
   return items.map(item => {
-    if (!item.id.startsWith('weapon:')) return item
-
     let weapon: WeaponScanData | undefined
 
     if (item.identity?.itemModel) {
-      weapon = modelMap.get(item.identity.itemModel)
+      const candidate = modelMap.get(item.identity.itemModel)
+      if (candidate && getWeaponName(candidate) === item.name) {
+        weapon = candidate
+      }
     }
 
     if (!weapon) {
-      const candidates = baseItemMap.get(item.identity?.baseItemId ?? '') ?? []
-      weapon = candidates.find(w => {
-        const customName = w.itemData.components['minecraft:custom_name'] as { text?: string } | undefined
-        return customName?.text === item.name
+      weapon = weapons.find(w => {
+        const isSameBase = !item.identity?.itemModel || item.identity.baseItemId === w.itemData.baseItemId
+        return isSameBase && getWeaponName(w) === item.name
       })
     }
 

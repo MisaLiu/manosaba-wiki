@@ -35,7 +35,13 @@ export interface CraftingSource {
   recipeId: string,
 }
 
-export type ItemSource = LocationSource | CraftingSource;
+export interface TaskRewardSource {
+  type: 'task_reward',
+  name: string,
+  probability?: number,
+}
+
+export type ItemSource = LocationSource | CraftingSource | TaskRewardSource;
 
 export interface WeaponStat {
   attribute: string

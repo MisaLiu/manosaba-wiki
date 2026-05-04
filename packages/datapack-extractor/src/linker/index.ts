@@ -242,6 +242,13 @@ const matchDefinitionFingerprints = (
     right.customNameNormalized &&
     left.customNameNormalized === right.customNameNormalized
   ) {
+    if (left.itemModel && right.itemModel && left.itemModel !== right.itemModel) {
+      return {
+        matched: false,
+        reason: `Refused merge by customName because itemModel differs: '${left.itemModel}' vs '${right.itemModel}'`,
+      };
+    }
+
     return {
       matched: true,
       strength: 'medium',
@@ -522,7 +529,7 @@ export const linkItemEvidence = (
   );
 
   for (let i = 0; i < weaponCandidates.length; i++) {
-    weaponCandidates[i].candidate.id = `weapon:${i}`;
+    weaponCandidates[i].candidate.id = `strong:${i}`;
   }
 
   const remainingUnlinked = unlinkedDatapackDefinitions.filter(

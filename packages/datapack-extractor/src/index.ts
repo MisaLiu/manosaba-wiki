@@ -14,18 +14,22 @@ import { scanItemTriggerEvidence } from './scanner/advancement';
 import { analyzeVariants } from './variants/index';
 import { scanWeaponDefinitions } from './scanner/weapon';
 import { adaptWeaponsToItemDefinitions } from './scanner/weapon/adapter';
+import { scanRewardDefinitions } from './scanner/reward';
 
 const OUTPUT_PATH = path.resolve(process.cwd(), 'dist/items.json');
 const RECIPES_OUTPUT_PATH = path.resolve(process.cwd(), 'dist/recipes.json');
 
 export const buildArtifacts = async () => {
   const supplyDefinitions = await scanSupplyDefinitions();
+  const rewardDefinitions = await scanRewardDefinitions();
   const datapackDefinitions = await scanDatapackItemDefinitions();
   const weaponDefinitions = await scanWeaponDefinitions();
   const recipes = await scanRecipes();
   const allDefinitions = [
     ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.template),
     ...adaptSupplyDefinitionsToItemDefinitions(supplyDefinitions.replacement),
+    ...adaptSupplyDefinitionsToItemDefinitions(rewardDefinitions.template),
+    ...adaptSupplyDefinitionsToItemDefinitions(rewardDefinitions.replacement),
     ...adaptRecipeResultsToItemDefinitions(recipes),
     ...datapackDefinitions,
     ...adaptWeaponsToItemDefinitions(weaponDefinitions),
@@ -45,6 +49,7 @@ export const buildArtifacts = async () => {
     triggers,
     recipes,
     supplyDefinitions,
+    rewardDefinitions,
     weaponDefinitions,
     linkResult,
     variantResult,
@@ -75,6 +80,8 @@ writeArtifacts().then((result) => {
     recipeCount: result.recipes.length,
     supplyTemplateCount: result.supplyDefinitions.template.length,
     supplyReplacementCount: result.supplyDefinitions.replacement.length,
+    rewardTemplateCount: result.rewardDefinitions.template.length,
+    rewardReplacementCount: result.rewardDefinitions.replacement.length,
     weaponCount: result.weaponDefinitions.length,
     linkedItemCount: result.linkResult.linkedItems.length,
     variantAnalysisCount: result.variantResult.analyses.length,

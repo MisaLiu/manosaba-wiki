@@ -3,7 +3,41 @@ import { ItemCardHeader } from './ItemHeader';
 import { ItemWeapon } from './ItemWeapon';
 import { MCRichText } from '../MCRichText/MCRichText';
 import { getLocationName } from '../../const';
-import type { Item, RichTextDocument } from '@manosaba/types';
+import type { Item, LocationSource, RichTextDocument, TaskRewardSource } from '@manosaba/types';
+
+const ItemSourceWithLocation = ({
+  sources
+}: { sources: (LocationSource | TaskRewardSource)[] }) => {
+  return (
+    <>
+      {sources
+        .sort((a, b) => (b.probability ?? 1) - (a.probability ?? 1))
+        .map((source) => (
+          <div class="pl-1em text-gray-200">
+            {source.type === 'location' ? '搜索获得' : '任务奖励'}
+            <span class="text-gray-400">·</span>
+            {getLocationName(source.name)}
+            <span class="text-gray-400">&nbsp;|&nbsp;</span>
+            {Math.round((source.probability ?? 1) * 1000) / 10}%
+            {source.type === 'location' && (
+              <>
+                {source.count && source.count > 1 && (
+                  <>
+                    <span class="text-gray-400">×</span>
+                    {source.count} 个
+                  </>
+                )}
+                <span class="text-gray-400">&nbsp;(</span>
+                <>{Math.ceil(1 / (source.probability ?? 1))}&nbsp;</>
+                <span class="text-gray-400">次尝试)</span>
+              </>
+            )}
+          </div>
+        ))
+      }
+    </>
+  )
+};
 
 type ItemDialogProps = {
   item: Item,
@@ -71,26 +105,17 @@ export const ItemDialog = ({ item }: ItemDialogProps) => {
 
       {sources && sources.length > 0 && (
         <div class="pt-2">
-          {sources
-            .filter(e => e.type === 'location')
-            .sort((a, b) => (b.probability ?? 1) - (a.probability ?? 1))
-            .map((source) => (
-                <div class="text-gray-400">
-                  <span class="text-gray-200">{Math.round((source.probability ?? 1) * 1000) / 10}% </span>
-                  的概率可以从 <span class="text-gray-200">{getLocationName(source.name)}</span> 找到
-                  {source.count && source.count > 1 && (
-                    <> <span class="text-gray-200">{source.count} 个</span></>
-                  )}
-                  <div class="ml-10 text-gray-400">
-                    平均需要尝试
-                    <span class="text-gray-200"> {Math.ceil(1 / (source.probability ?? 1))} 次</span>
-                  </div>
-                </div>
-              )
-            )
-          }
+          <div>来源：</div>
+          <ItemSourceWithLocation
+            sources={sources.filter(e => e.type === 'location')}
+          />
+
+          <ItemSourceWithLocation
+            sources={sources.filter(e => e.type === 'task_reward')}
+          />
+
           {sources.filter(e => e.type === 'crafting').length > 0 && (
-            <div>本物品拥有合成配方</div>
+            <div class="pl-1em">合成配方</div>
           )}
         </div>
       )}
