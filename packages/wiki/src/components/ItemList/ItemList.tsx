@@ -1,15 +1,26 @@
-import { useState } from 'preact/hooks';
+import { useState, useMemo } from 'preact/hooks';
 import { ItemTypeMap, LocationMap } from '../../const';
 import { useItemStore } from '../../store/item';
+import { SearchBar } from '../SearchBar/SearchBar';
 import { ItemFilter } from './ItemFilter';
 import { ItemCard } from './ItemCard';
 import type { ItemSource, LocationSource } from '@manosaba/types';
+import type { SearchIndex } from '../SearchBar/SearchBar';
 import './style.css';
 
 export const ItemList = () => {
+  const [ searchResult, setSearchResult ] = useState<SearchIndex[] | null>(null);
   const [ filterTypes, setFilterTypes ] = useState<string[]>([]);
   const [ filterLocations, setFilterLocations ] = useState<string[]>([]);
+
   const itemsOrig = useItemStore(e => e.items);
+  const itemSearchIndex: SearchIndex[] = useMemo(() => (
+    itemsOrig.map((e) => ({ id: e.id, name: e.name }))
+  ), [ itemsOrig ]);
+
+  const updateSearchResult = (results: SearchIndex[] | null) => {
+    setSearchResult(results);
+  };
 
   const updateFilterTypes = (filters: string[]) => {
     setFilterTypes(filters);
@@ -21,6 +32,13 @@ export const ItemList = () => {
 
   const items = (
     itemsOrig
+      .filter((item) => {
+        if (!searchResult) return true;
+
+        return (
+          searchResult.findIndex(e => e.id === item.id) !== -1
+        );
+      })
       .filter((item) => {
         if (filterTypes.length <= 0) return true;
         if (!item.types || item.types.length <= 0) return false;
@@ -69,6 +87,15 @@ export const ItemList = () => {
 
   return (
     <>
+      <SearchBar
+        data={itemSearchIndex}
+        config={{
+          keys: [ 'name' ],
+          threshold: 0.3,
+        }}
+        onSearch={updateSearchResult}
+      />
+
       <ItemFilter
         label='类型：'
         filterMap={ItemTypeMap}
