@@ -27,13 +27,13 @@ export const LocationMap: Readonly<Record<string, string>> = {
 
 export const ItemTypeMap: Readonly<Record<ItemType, string>> = {
   weapon: '武器',
-  consumable: '消耗品',
+  // consumable: '消耗品',
   food: '食物',
   medicine: '药品',
   tool: '工具',
   // quest: '任务',
-  clue: '线索',
-  magic: '魔法',
+  // clue: '线索',
+  // magic: '魔法',
   utility: '道具',
   magical_utility: '魔法道具',
   accessories: '饰品',

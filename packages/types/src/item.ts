@@ -2,13 +2,13 @@ import type { RichTextDocument } from './richtext';
 
 export type ItemType =
   | 'weapon'
-  | 'consumable'
+  // | 'consumable'
   | 'food'
   | 'medicine'
   | 'tool'
   // | 'quest'
-  | 'clue'
-  | 'magic'
+  // | 'clue'
+  // | 'magic'
   | 'utility'
   | 'magical_utility'
   | 'accessories'
