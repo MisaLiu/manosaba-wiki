@@ -1,8 +1,8 @@
 import { useState } from 'preact/hooks';
-import { getItemType, getLocationName, ItemTypeMap, LocationMap } from '../../const';
+import { ItemTypeMap, LocationMap } from '../../const';
 import { useItemStore } from '../../store/item';
+import { ItemFilter } from './ItemFilter';
 import { ItemCard } from './ItemCard';
-import type { TargetedEvent } from 'preact';
 import type { ItemSource, LocationSource } from '@manosaba/types';
 import './style.css';
 
@@ -11,32 +11,12 @@ export const ItemList = () => {
   const [ filterLocations, setFilterLocations ] = useState<string[]>([]);
   const itemsOrig = useItemStore(e => e.items);
 
-  const toggleFilterType = (type: string, enabled: boolean) => {
-    setFilterTypes((old) => {
-      if (!enabled) return old.filter(e => e !== type);
-      return [ ...old, type ];
-    });
+  const updateFilterTypes = (filters: string[]) => {
+    setFilterTypes(filters);
   };
 
-  const toggleFilterLocation = (id: string, enabled: boolean) => {
-    setFilterLocations((old) => {
-      if (!enabled) return old.filter(e => e !== id);
-      return [ ...old, id ];
-    });
-  };
-
-  const handleTypeFilter = (e: TargetedEvent, type: string) => {
-    const target = e.target as HTMLInputElement;
-    const { checked } = target;
-
-    toggleFilterType(type, checked);
-  };
-
-  const handleLocationFilter = (e: TargetedEvent, locationId: string) => {
-    const target = e.target as HTMLInputElement;
-    const { checked } = target;
-
-    toggleFilterLocation(locationId, checked);
+  const updateFilterLocations = (filters: string[]) => {
+    setFilterLocations(filters);
   };
 
   const items = (
@@ -89,69 +69,17 @@ export const ItemList = () => {
 
   return (
     <>
-      <div class="my-2 py-2 flex items-center gap-1 whitespace-nowrap w-full overflow-x-auto overflow-y-visible">
-        <div>类别：</div>
-        <div class="flex flex-1 gap-2">
-          {Object.keys(ItemTypeMap).map((type) => (
-            <label class="whitespace-nowrap shrink-0">
-              <input class="peer sr-only" type='checkbox' onChange={(e) => handleTypeFilter(e, type)} />
-              <span
-                class={[
-                  'min-w-8',
-                  'px-3',
-                  'py-1',
-                  'transition',
-                  'transition-linear',
-                  'duration-100',
-                  'border',
-                  'border-gray-600',
-                  'hover:border-gray-500',
-                  'rounded-full',
-                  'bg-transparent',
-                  'hover:bg-gray-800',
-                  'cursor-pointer',
-                  'peer-checked:bg-blue-600',
-                  'peer-checked:text-white',
-                  'peer-checked:border-blue-400',
-                  'box-border'
-                ].join(' ')}
-              >{getItemType(type)}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+      <ItemFilter
+        label='类型：'
+        filterMap={ItemTypeMap}
+        onFilter={updateFilterTypes}
+      />
 
-      <div class="my-2 py-2 flex items-center gap-1 whitespace-nowrap w-full overflow-x-auto overflow-y-visible">
-        <div>地点：</div>
-        <div class="flex flex-1 gap-2">
-          {Object.keys(LocationMap).map((locationId) => (
-            <label class="whitespace-nowrap shrink-0">
-              <input class="peer sr-only" type='checkbox' onChange={(e) => handleLocationFilter(e, locationId)} />
-              <span
-                class={[
-                  'min-w-8',
-                  'px-3',
-                  'py-1',
-                  'transition',
-                  'transition-linear',
-                  'duration-100',
-                  'border',
-                  'border-gray-600',
-                  'hover:border-gray-500',
-                  'rounded-full',
-                  'bg-transparent',
-                  'hover:bg-gray-800',
-                  'cursor-pointer',
-                  'peer-checked:bg-blue-600',
-                  'peer-checked:text-white',
-                  'peer-checked:border-blue-400',
-                  'box-border'
-                ].join(' ')}
-              >{getLocationName(locationId)}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+      <ItemFilter
+        label='地点：'
+        filterMap={LocationMap}
+        onFilter={updateFilterLocations}
+      />
 
       <div class="item-list">
         {items.map((item) => (
