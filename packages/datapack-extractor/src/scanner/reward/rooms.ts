@@ -6,7 +6,7 @@ const REWARD_DIR = path.resolve(DATAPACK_ROOT, 'data/tasks/function/task_frame/r
 
 const TASK_ROOM_TO_ROOM_ID: Record<string, string> = {
   atrium: 'atrium',
-  lobby1f: 'hallway_1st',
+  lobby1f: 'lobby_1st',
   showerroom: 'shower_room',
   burnroom: 'burn_room',
   noahstudio: 'noah_studio',
@@ -15,7 +15,7 @@ const TASK_ROOM_TO_ROOM_ID: Record<string, string> = {
   museum: 'museum',
   receptionroom: 'reception_room',
   playroom: 'play_room',
-  lobby2f: 'hallway_2nd',
+  lobby2f: 'lobby_2nd',
   liveroom1f: 'liveroom_1st',
   liveroom2f: 'liveroom_2nd',
   infirmary: 'infirmary',
