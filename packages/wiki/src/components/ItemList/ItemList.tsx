@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'preact/hooks';
+import { useRoute, useLocation } from 'wouter-preact';
 import { ItemTypeMap, LocationMap } from '../../const';
 import { useItemStore } from '../../store/item';
 import { SearchBar } from '../SearchBar/SearchBar';
 import { ItemFilter } from './ItemFilter';
 import { ItemCard } from './ItemCard';
+import { ItemDialog } from './ItemDialog';
 import type { ItemSource, LocationSource } from '@manosaba/types';
 import type { SearchIndex } from '../SearchBar/SearchBar';
 import './style.css';
@@ -12,11 +14,18 @@ export const ItemList = () => {
   const [ searchResult, setSearchResult ] = useState<SearchIndex[] | null>(null);
   const [ filterTypes, setFilterTypes ] = useState<string[]>([]);
   const [ filterLocations, setFilterLocations ] = useState<string[]>([]);
+  const [, navigate] = useLocation();
+
+  const [match, params] = useRoute('/item/:key');
 
   const itemsOrig = useItemStore(e => e.items);
   const itemSearchIndex: SearchIndex[] = useMemo(() => (
     itemsOrig.map((e) => ({ id: e.id, name: e.name }))
   ), [ itemsOrig ]);
+
+  const selectedItem = match
+    ? itemsOrig.find(e => e.id === params?.key)
+    : undefined;
 
   const updateSearchResult = (results: SearchIndex[] | null) => {
     setSearchResult(results);
@@ -87,31 +96,74 @@ export const ItemList = () => {
 
   return (
     <>
-      <SearchBar
-        data={itemSearchIndex}
-        config={{
-          keys: [ 'name' ],
-          threshold: 0.3,
-        }}
-        onSearch={updateSearchResult}
+      <div>
+        <SearchBar
+          data={itemSearchIndex}
+          config={{
+            keys: [ 'name' ],
+            threshold: 0.3,
+          }}
+          onSearch={updateSearchResult}
+        />
+
+        <ItemFilter
+          label='类型：'
+          filterMap={ItemTypeMap}
+          onFilter={updateFilterTypes}
+        />
+
+        <ItemFilter
+          label='地点：'
+          filterMap={LocationMap}
+          onFilter={updateFilterLocations}
+        />
+
+        <div class="item-list">
+          {items.map((item) => (
+            <ItemCard item={item} source={getBestLocationSource(item.sources)} key={item.id} />
+          ))}
+        </div>
+      </div>
+
+      <div
+        class={`fixed inset-0 bg-black transition-opacity duration-300 z-0 ${
+          selectedItem ? 'opacity-50' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => navigate('/')}
       />
 
-      <ItemFilter
-        label='类型：'
-        filterMap={ItemTypeMap}
-        onFilter={updateFilterTypes}
-      />
-
-      <ItemFilter
-        label='地点：'
-        filterMap={LocationMap}
-        onFilter={updateFilterLocations}
-      />
-
-      <div class="item-list">
-        {items.map((item) => (
-          <ItemCard item={item} source={getBestLocationSource(item.sources)} key={item.id} />
-        ))}
+      <div
+        class={[
+          'fixed',
+          'right-0',
+          'top-0',
+          'w-85vw',
+          'md:w-30em',
+          'h-full',
+          'overflow-y-auto',
+          'bg-gray-900',
+          'border-l',
+          'border-gray-700',
+          'z-10',
+          'transition-transform',
+          'duration-300',
+          'ease-in-out',
+          selectedItem ? 'translate-x-0' : 'translate-x-full'
+        ].join(' ')}
+      >
+        {selectedItem && (
+          <>
+            <div class="sticky top-0 bg-gray-900 z-10 px-4 pt-2 pb-2 border-b border-gray-800">
+              <button
+                class="text-gray-400 hover:text-gray-200 transition cursor-pointer"
+                onClick={() => navigate('/item')}
+              >
+                × 关闭
+              </button>
+            </div>
+            <ItemDialog item={selectedItem} />
+          </>
+        )}
       </div>
     </>
   )

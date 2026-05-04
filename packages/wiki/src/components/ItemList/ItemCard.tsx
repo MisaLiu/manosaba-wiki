@@ -1,8 +1,7 @@
+import { Link } from 'wouter-preact';
 import { MCRichText } from '../MCRichText/MCRichText';
 import { ItemCardHeader } from './ItemHeader';
 import { ItemTag } from './ItemTag';
-import { ItemDialog } from './ItemDialog';
-import * as dialog from '../../dialog';
 import type { Item, LocationSource } from '@manosaba/types';
 
 type ItemCardProps = {
@@ -11,10 +10,6 @@ type ItemCardProps = {
 };
 
 export const ItemCard = ({ item, source }: ItemCardProps) => {
-  const showDetailDialog = () => {
-    dialog.show(<ItemDialog item={item} />);
-  };
-
   const getRarityClasses = (): string => {
     let probability: number | undefined;
 
@@ -47,12 +42,10 @@ export const ItemCard = ({ item, source }: ItemCardProps) => {
   };
 
   return (
-    <button
-      type="button"
-      class={`p-4 transition transition-linear duration-100 border rounded-md cursor-pointer item-list-card w-full text-left ${getRarityClasses()}`}
-      onClick={showDetailDialog}
-    >
-      <div class="pb-2">
+    <Link
+      href={`/item/${item.id}`}
+      class={`block p-4 transition transition-linear duration-100 border rounded-md cursor-pointer item-list-card w-full text-left ${getRarityClasses()}`}
+    >      <div class="pb-2">
         {source ? (
           <div>
             <div class="flex items-center justify-between gap-2 pb-1">
@@ -79,6 +72,6 @@ export const ItemCard = ({ item, source }: ItemCardProps) => {
       </div>
 
       <MCRichText document={item.descriptionRich} />
-    </button>
+    </Link>
   );
 };
