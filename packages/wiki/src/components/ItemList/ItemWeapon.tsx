@@ -1,3 +1,4 @@
+import { Tooltip } from '../Tooltip/Tooltip';
 import { getLocationName } from '../../const';
 import type { WeaponInfo, WeaponSpawnCount } from '@manosaba/types';
 
@@ -27,17 +28,25 @@ const ItemWeaponProperty = ({ info }: ItemWeaponPropertyProps) => {
     <div>
       每局随机刷新&nbsp;
       {below10 && (
-        <>
+        <Tooltip
+          tooltip={
+            <>人数少于 10 人时</>
+          }
+        >
           <span class="text-gray-200">{below10[0] === below10[1] ? below10[0] : `${below10[0]}~${below10[1]}`}</span>&nbsp;
           把
-        </>
+        </Tooltip>
       )}
       {below10 && above10 && (<> / </>)}
       {above10 && (
-        <>
+        <Tooltip
+          tooltip={
+            <>人数多于 10 人时</>
+          }
+        >
           <span class="text-gray-200">{above10[0] === above10[1] ? above10[0] : `${above10[0]}~${above10[1]}`}</span>&nbsp;
           把
-        </>
+        </Tooltip>
       )}
     </div>
   )
@@ -53,14 +62,20 @@ export const ItemWeapon = ({
   return (
     <div class="pt-2 text-gray-400">
       <div>
-        {
-          info.cost === 2 ? (<span class="text-green-500">绿色</span>) :
-          info.cost === 3 ? (<span class="text-blue-500">蓝色</span>) :
-          info.cost === 4 ? (<span class="text-purple-400">紫色</span>) :
-          info.cost === 5 ? (<span class="text-yellow-600">橙色</span>) :
-          (<span class="text-gray-200">{info.cost}</span>)
-        }&nbsp;
-        等级武器
+        <Tooltip
+          tooltip={
+            <>相当于要做 {info.cost} 个任务</>
+          }
+        >
+          {
+            info.cost === 2 ? (<span class="text-green-500">绿色</span>) :
+            info.cost === 3 ? (<span class="text-blue-500">蓝色</span>) :
+            info.cost === 4 ? (<span class="text-purple-400">紫色</span>) :
+            info.cost === 5 ? (<span class="text-yellow-600">橙色</span>) :
+            (<span class="text-gray-200">{info.cost}</span>)
+          }&nbsp;
+          等级武器
+        </Tooltip>
       </div>
       
       {(info.durability > 0 || info.damageType) && (
@@ -82,7 +97,6 @@ export const ItemWeapon = ({
       )}
 
       <ItemWeaponProperty info={info.spawnCount} />
-
 
       <div>
         <div>可刷新点位：</div>
