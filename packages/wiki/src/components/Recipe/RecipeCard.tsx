@@ -19,9 +19,7 @@ export const RecipeCard = ({
       >
         {recipe.result.name}
       </h2>
-      {(recipe.kind === 'crafting_shapeless' || recipe.kind === 'crafting_shaped') && (
-        <RecipeCrafting recipe={recipe} />
-      )}
+      <RecipeCrafting recipe={recipe} />
     </div>
   )
 };

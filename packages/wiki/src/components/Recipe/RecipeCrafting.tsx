@@ -1,4 +1,5 @@
 import { MCUICraftingTable } from '../MCUI/MDUICraftingTable';
+import { MCUICampfire } from '../MCUI/MDUICampfire';
 import { MCUIItem } from '../MCUI/MCUIItem';
 import type { Recipe, RecipeIngredient } from '@manosaba/types';
 
@@ -49,6 +50,15 @@ export const RecipeCrafting = ({
         shapeless
       />
     )
+  }
+
+  if (recipe.kind === 'campfire_cooking' && recipe.ingredient) {
+    return (
+      <MCUICampfire
+        input={renderIngredient(recipe.ingredient)}
+        output={renderResult(recipe)}
+      />
+    );
   }
 
   return null;
