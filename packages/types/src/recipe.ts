@@ -1,9 +1,14 @@
+import type { RichTextDocument } from './richtext';
+
 export type RecipeKind = 'crafting_shaped' | 'crafting_shapeless' | 'crafting_transmute' | 'campfire_cooking';
 
 export interface RecipeIngredient {
   baseItemId?: string,
   itemId?: string,
   tagId?: string,
+  name?: string,
+  textureKey?: string,
+  descriptionRich?: RichTextDocument,
 }
 
 export interface RecipeResultIdentity {
@@ -12,6 +17,9 @@ export interface RecipeResultIdentity {
   customName?: string,
   customData?: string,
   count?: number,
+  name?: string,
+  textureKey?: string,
+  descriptionRich?: RichTextDocument,
 }
 
 export interface Recipe {

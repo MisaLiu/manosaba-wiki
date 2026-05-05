@@ -9,12 +9,32 @@ type MCUICraftingTableProps = {
   shapeless?: boolean
 };
 
+const SHAPELESS_ORDER = [4, 3, 5, 1, 7, 0, 2, 6, 8];
+
+const getShapelessSlot = (filledCount: number, index: number): number | null => {
+  if (index >= filledCount) return null
+  return SHAPELESS_ORDER[index]
+};
+
 export const MCUICraftingTable = ({
   inputs,
   output,
   shapeless
 }: MCUICraftingTableProps) => {
-  const inputSlots = Array(9).fill(null).map((_, i) => i);
+  const slots = Array(9).fill(null);
+  const usedInputs = inputs.filter(Boolean);
+  const filledCount = Math.min(usedInputs.length, 9);
+
+  if (shapeless) {
+    for (let i = 0; i < filledCount; i++) {
+      const slot = getShapelessSlot(filledCount, i);
+      if (slot !== null) slots[slot] = usedInputs[i];
+    }
+  } else {
+    for (let i = 0; i < usedInputs.length; i++) {
+      slots[i] = usedInputs[i];
+    }
+  }
 
   return (
     <MCUI>
@@ -24,8 +44,8 @@ export const MCUICraftingTable = ({
         <div
           class="grid grid-rows-3 grid-cols-3"
         >
-          {inputSlots.map((i) => (
-            <MCUIInput>{inputs[i]}</MCUIInput>
+          {slots.map((input) => (
+            <MCUIInput>{input}</MCUIInput>
           ))}
         </div>
         <div>
