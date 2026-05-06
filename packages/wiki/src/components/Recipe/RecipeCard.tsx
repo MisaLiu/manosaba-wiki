@@ -9,9 +9,10 @@ export const RecipeCard = ({
   recipe
 }: RecipeCardProps) => {
   return (
-    <div>
+    <div class="recipe-card mb-2">
       <h2
         class={[
+          'mb-2',
           'text-xl',
           'font-semibold'
         ].join(' ')}

@@ -37,17 +37,11 @@ export const MCUICampfire = ({
                   'w-32px',
                   'h-32px'
                 ].join(' ')}
-                style={{
-                  imageRendering: 'pixelated'
-                }}
               />
             </Tooltip>
           </div>
           <img
             src="gui/arrow_large_full.png"
-            style={{
-              imageRendering: 'pixelated'
-            }}
           />
           {timeCost && (
             <div

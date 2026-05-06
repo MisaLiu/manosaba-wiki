@@ -3,6 +3,7 @@ import { useRecipeStore } from '../../store/recipe';
 import { SearchBar } from '../SearchBar/SearchBar';
 import { RecipeCard } from './RecipeCard';
 import type { SearchIndex } from '../SearchBar/SearchBar';
+import './style.css';
 
 export const RecipeList = () => {
   const [ searchResult, setSearchResult ] = useState<SearchIndex[] | null>(null);
@@ -37,9 +38,11 @@ export const RecipeList = () => {
         }}
         onSearch={updateSearchResult}
       />
-      {recipes.map((recipe) => (
-        <RecipeCard recipe={recipe} />
-      ))}
+      <div class="recipe-list mt-2">
+        {recipes.map((recipe) => (
+          <RecipeCard recipe={recipe} />
+        ))}
+      </div>
     </div>
   );
 };

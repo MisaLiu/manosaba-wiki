@@ -51,9 +51,6 @@ export const MCUICraftingTable = ({
         <div>
           <img
             src="gui/arrow_small.png"
-            style={{
-              imageRendering: 'pixelated'
-            }}
           />
         </div>
         <div>
@@ -75,9 +72,6 @@ export const MCUICraftingTable = ({
               'right-0',
               'm-5px'
             ].join(' ')}
-            style={{
-              imageRendering: 'pixelated'
-            }}
           />
         </Tooltip>
       )}
