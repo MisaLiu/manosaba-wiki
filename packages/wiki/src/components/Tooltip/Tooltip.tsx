@@ -1,6 +1,6 @@
 import { useRef, useState } from 'preact/hooks';
 import { createPortal } from 'preact/compat';
-import type { ComponentChild, TargetedPointerEvent } from 'preact';
+import type { ComponentChild, TargetedMouseEvent } from 'preact';
 
 type CursorPosition = {
   x: number,
@@ -20,14 +20,31 @@ export const Tooltip = ({
   const [ show, setShow ] = useState<boolean>(false);
   const [ pos, setPos ] = useState<CursorPosition>({ x: 0, y: 0 });
 
-  const handlePointerMove = (e: TargetedPointerEvent<HTMLSpanElement>) => {
-    if (e.pointerType !== 'touch') return setPos({ x: e.clientX + 10, y: e.clientY + 10 });
-    
+  const handlePointerMove = (e: TargetedMouseEvent<HTMLSpanElement>) => {
     const tooltipDom = tooltipRef.current;
-    setPos({ x: e.clientX, y: e.clientY - (tooltipDom?.clientHeight ?? 30) - 30 });
+
+    let resultX = e.clientX + 5;
+    let resultY = e.clientY - 5;
+
+    if (tooltipDom) {
+      resultY -= tooltipDom.clientHeight;
+
+      if ((resultX + tooltipDom.clientWidth) >= document.documentElement.clientWidth) {
+        resultX = document.documentElement.clientWidth - tooltipDom.clientWidth;
+      }
+
+      if ((resultY + tooltipDom.clientHeight) >= document.documentElement.clientHeight) {
+        resultY = document.documentElement.clientHeight - tooltipDom.clientHeight;
+      }
+    }
+
+    if (resultX <= 0) resultX = 0;
+    if (resultY <= 0) resultY = 0;
+
+    setPos({ x: resultX, y: resultY});
   };
 
-  const handlePointerEnter = (e: TargetedPointerEvent<HTMLSpanElement>) => {
+  const handlePointerEnter = (e: TargetedMouseEvent<HTMLSpanElement>) => {
     setShow(true);
     handlePointerMove(e);
   };
@@ -36,9 +53,9 @@ export const Tooltip = ({
     <>
       <span
         class="cursor-help"
-        onPointerEnter={(e) => handlePointerEnter(e)}
-        onPointerLeave={() => setShow(false)}
-        onPointerMove={(e) => handlePointerMove(e)}
+        onMouseEnter={(e) => handlePointerEnter(e)}
+        onMouseLeave={() => setShow(false)}
+        onMouseMove={(e) => handlePointerMove(e)}
       >
         {children}
       </span>
@@ -53,6 +70,7 @@ export const Tooltip = ({
             'rounded-2',
             'shadow-md',
             'shadow-gray-900',
+            'text-nowrap',
             'px-2',
             'py-1',
             'z-100',
