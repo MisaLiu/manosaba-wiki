@@ -38,7 +38,7 @@ export const ItemFilter = ({
       <div class="flex flex-1 gap-2">
         {Object.keys(filterMap).map((type) => (
           <label class="whitespace-nowrap shrink-0">
-            <input class="peer sr-only" type='checkbox' onChange={(e) => handleFilter(e, type)} />
+            <input class="peer hidden" type='checkbox' onChange={(e) => handleFilter(e, type)} />
             <span
               class={[
                 'min-w-8',
