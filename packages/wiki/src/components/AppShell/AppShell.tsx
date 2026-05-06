@@ -1,7 +1,8 @@
-import type { ComponentChildren } from 'preact';
 import { useState } from 'preact/hooks';
 import { Drawer } from './Drawer';
 import { TitleBar } from './TitleBar';
+import { Footer } from './Footer';
+import type { ComponentChildren } from 'preact';
 
 type AppShellProps = {
   children: ComponentChildren,
@@ -45,6 +46,8 @@ export const AppShell = ({
       <main class="min-h-screen px-4 pb-6 pt-18 md:ml-64 md:px-6 md:pb-8 md:pt-18">
         {children}
       </main>
+
+      <Footer />
     </div>
   );
 };
