@@ -102,7 +102,11 @@ export const ItemList = () => {
 
   return (
     <>
-      <div>
+      <div class="item-list-layout">
+        <h1
+          class="text-2xl font-bold truncate"
+        >道具搜索</h1>
+
         <SearchBar
           data={itemSearchIndex}
           config={{
@@ -124,7 +128,7 @@ export const ItemList = () => {
           onFilter={updateFilterLocations}
         />
 
-        <div class="item-list">
+        <div class="item-list mt-4">
           {items.map((item) => (
             <ItemCard item={item} source={getBestLocationSource(item.sources)} key={item.id} />
           ))}
@@ -132,7 +136,7 @@ export const ItemList = () => {
       </div>
 
       <div
-        class={`fixed inset-0 bg-black transition-opacity duration-300 z-0 ${
+        class={`fixed inset-0 bg-black transition-opacity duration-300 z-45 ${
           selectedItem ? 'opacity-50' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => navigate('/item')}
@@ -150,7 +154,7 @@ export const ItemList = () => {
           'bg-gray-900',
           'border-l',
           'border-gray-700',
-          'z-10',
+          'z-50',
           'transition-transform',
           'duration-300',
           'ease-in-out',

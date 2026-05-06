@@ -29,7 +29,11 @@ export const RecipeList = () => {
   );
 
   return (
-    <div>
+    <div class="recipe-list-layout">
+      <h1
+        class="text-2xl font-bold truncate"
+      >配方查询</h1>
+
       <SearchBar
         data={recipeSearchIndex}
         config={{
@@ -38,7 +42,8 @@ export const RecipeList = () => {
         }}
         onSearch={updateSearchResult}
       />
-      <div class="recipe-list mt-2">
+
+      <div class="recipe-list mt-4">
         {recipes.map((recipe) => (
           <RecipeCard recipe={recipe} />
         ))}

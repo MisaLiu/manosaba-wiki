@@ -1,3 +1,7 @@
+.recipe-list-layout {
+  container-type: inline-size;
+}
+
 .recipe-list {
   column-count: 1;
   column-gap: calc(var(--spacing) * 4);
@@ -7,31 +11,31 @@
   break-inside: avoid;
 }
 
-@media (min-width: 480px) {
+@container (min-width: 480px) {
   .recipe-list {
     column-count: 2;
   }
 }
 
-@media (min-width: 720px) {
+@container (min-width: 720px) {
   .recipe-list {
     column-count: 3;
   }
 }
 
-@media (min-width: 960px) {
+@container (min-width: 960px) {
   .recipe-list {
     column-count: 4;
   }
 }
 
-@media (min-width: 1200px) {
+@container (min-width: 1200px) {
   .recipe-list {
     column-count: 5;
   }
 }
 
-@media (min-width: 1450px) {
+@container (min-width: 1450px) {
   .recipe-list {
     column-count: 6;
   }

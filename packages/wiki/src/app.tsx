@@ -3,6 +3,7 @@ import { useHashLocation } from 'wouter-preact/use-hash-location';
 import { useLoading } from './hooks/useLoading';
 import { ItemList } from './components/ItemList/ItemList';
 import { RecipeList } from './components/Recipe/RecipeList';
+import { AppShell } from './components/AppShell/AppShell';
 
 export function App() {
   const {
@@ -24,12 +25,14 @@ export function App() {
 
   return (
     <Router hook={useHashLocation}>
-      <Switch>
-        <Route path="/" component={ItemList} />
-        <Route path="/item" component={ItemList} />
-        <Route path="/item/:key" component={ItemList} />
-        <Route path="/recipe" component={RecipeList} />
-      </Switch>
+      <AppShell>
+        <Switch>
+          <Route path="/" component={ItemList} />
+          <Route path="/item" component={ItemList} />
+          <Route path="/item/:key" component={ItemList} />
+          <Route path="/recipe" component={RecipeList} />
+        </Switch>
+      </AppShell>
     </Router>
   );
 }
