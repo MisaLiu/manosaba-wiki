@@ -13,69 +13,7 @@ on:
         type: string
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    outputs:
-      sha_short: ${{ steps.git_sha.outputs.sha_short }}
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Get git short sha
-      id: git_sha
-      shell: bash
-      run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
-
-    - name: Use pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: latest
-        run_install: false
-
-    - name: Use Node.js 22.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: '22.x'
-        cache: 'pnpm'
-
-    - run: pnpm install --frozen-lockfile
-
-    - name: Download and unzip world
-      run: |
-        mkdir world && cd world
-        wget "${{ github.event.inputs.world_url }}" -O world.zip
-        unzip world.zip
-    
-    - name: Download and unzip resource pack
-      run: |
-        mkdir resourcepack && cd resourcepack
-        wget "${{ github.event.inputs.res_url }}" -O resourcepack.zip
-        unzip resourcepack.zip
-
-    - name: Extract info from world
-      working-directory: packages/datapack-extractor
-      run: npx vite-node ./src/index.ts
-
-    - name: Copy extracted info
-      run: |
-        mkdir -p packages/wiki/public
-        cp packages/datapack-extractor/dist/*.json packages/wiki/public/
-        mkdir -p packages/wiki/public/textures
-        cp -r packages/datapack-extractor/dist/textures/* packages/wiki/public/textures/
-
-    - name: Build wiki page
-      working-directory: packages/wiki
-      run: pnpm run build --base=/manosaba-wiki/
-
-    - name: Upload build artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        name: build-${{ steps.git_sha.outputs.sha_short }}
-        path: packages/wiki/dist/
-
-  pages:
-    needs: build
+  deploy:
     runs-on: ubuntu-latest
 
     permissions:
@@ -91,7 +29,61 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Get git short sha
+        id: git_sha
+        shell: bash
+        run: echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+
+      - name: Use pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Download and unzip world
+        run: |
+          mkdir world && cd world
+          wget "${{ github.event.inputs.world_url }}" -O world.zip
+          unzip world.zip
+      
+      - name: Download and unzip resource pack
+        run: |
+          mkdir resourcepack && cd resourcepack
+          wget "${{ github.event.inputs.res_url }}" -O resourcepack.zip
+          unzip resourcepack.zip
+
+      - name: Extract info from world
+        working-directory: packages/datapack-extractor
+        run: npx vite-node ./src/index.ts
+
+      - name: Copy extracted info
+        run: |
+          mkdir -p packages/wiki/public
+          cp packages/datapack-extractor/dist/*.json packages/wiki/public/
+          mkdir -p packages/wiki/public/textures
+          cp -r packages/datapack-extractor/dist/textures/* packages/wiki/public/textures/
+
+      - name: Build wiki page
+        working-directory: packages/wiki
+        run: pnpm run build --base=/manosaba-wiki/
+
+      - name: Upload build artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: build-${{ steps.git_sha.outputs.sha_short }}
+          path: packages/wiki/dist/
+
       - uses: actions/deploy-pages@v4
         id: deployment
         with:
-          artifact_name: build-${{ needs.build.outputs.sha_short }}
+          artifact_name: build-${{ steps.git_sha.outputs.sha_short }}
