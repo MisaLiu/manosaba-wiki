@@ -1,5 +1,5 @@
 import { Tooltip } from '../Tooltip/Tooltip';
-import { getTexturePathFromKey } from '../../utils';
+import { getTexturePathFromKey, handleTextureFailed } from '../../utils';
 import type { RichTextDocument } from '@manosaba/types';
 import { MCRichText } from '../MCRichText/MCRichText';
 
@@ -28,13 +28,11 @@ export const MCUIItem = ({
     >
       <img
         src={getTexturePathFromKey(textureKey)}
+        onError={handleTextureFailed}
         class={[
           'w-32px',
           'h-32px',
         ].join(' ')}
-        style={{
-          imageRendering: 'pixelated'
-        }}
       />
     </Tooltip>
   );

@@ -1,11 +1,6 @@
 import { ItemTag } from './ItemTag';
+import { getTexturePathFromKey, handleTextureFailed } from '../../utils';
 import type { ItemType } from '@manosaba/types';
-
-const getTexturePathFromKey = (key: string) => {
-  const [ namespace, id ] = key.split(':');
-  if (!namespace || !id) return 'textures/manosaba/master.png';
-  return `textures/${namespace}/${id}.png`;
-};
 
 type ItemCardHeaderProps = {
   name: string,
@@ -24,6 +19,7 @@ export const ItemCardHeader = ({
         <div>
           <img
             src={getTexturePathFromKey(textureKey)}
+            onError={handleTextureFailed}
             class={[
               'w-3.25em',
               'h-3.25em',

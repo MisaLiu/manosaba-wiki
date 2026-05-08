@@ -45,7 +45,7 @@ export const SearchBar = ({
   };
 
   return (
-    <div class="mt-2">
+    <div class="mt-4">
       <input
         type='text'
         placeholder='搜索...'

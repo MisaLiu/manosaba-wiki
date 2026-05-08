@@ -1,17 +1,15 @@
-import { useEffect } from 'preact/hooks';
 import { Router, Route, Switch } from 'wouter-preact';
 import { useHashLocation } from 'wouter-preact/use-hash-location';
-import { useItemStore } from './store/item';
+import { useLoading } from './hooks/useLoading';
 import { ItemList } from './components/ItemList/ItemList';
+import { RecipeList } from './components/Recipe/RecipeList';
+import { AppShell } from './components/AppShell/AppShell';
 
 export function App() {
-  const loading = useItemStore(e => e.loading);
-  const error = useItemStore(e => e.error);
-  const fetchItems = useItemStore(e => e.fetchItems);
-
-  useEffect(() => {
-    fetchItems();
-  }, []);
+  const {
+    loading,
+    error,
+  } = useLoading();
 
   if (loading) {
     return (
@@ -27,11 +25,14 @@ export function App() {
 
   return (
     <Router hook={useHashLocation}>
-      <Switch>
-        <Route path="/" component={ItemList} />
-        <Route path="/item" component={ItemList} />
-        <Route path="/item/:key" component={ItemList} />
-      </Switch>
+      <AppShell>
+        <Switch>
+          <Route path="/" component={ItemList} />
+          <Route path="/item" component={ItemList} />
+          <Route path="/item/:key" component={ItemList} />
+          <Route path="/recipe" component={RecipeList} />
+        </Switch>
+      </AppShell>
     </Router>
   );
 }
